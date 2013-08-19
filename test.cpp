@@ -1,3 +1,10 @@
+/*
+ * File: test.cpp
+ * Author: Terese Haimberger
+ *
+ * Experimenting with the ncurses library.
+ */
+
 #include <ncurses.h>
 
 const int MAX_ROW = 22;
@@ -11,7 +18,7 @@ void initialize_gui() {
   cbreak();
   keypad(stdscr, TRUE);
   noecho();
-  curs_set(0); /* hide cursor*/
+  curs_set(0); // hide cursor
 }
 
 void update_pos(char key, int &row, int &col) {
@@ -29,9 +36,9 @@ void update_pos(char key, int &row, int &col) {
 
 int main() {
 
-  int max_row, max_col; /* size of standard screen */
-  int row, col;         /* current row and column of rogue */
-  int key;              /* key pressed by user */
+  int max_row, max_col; // size of standard screen
+  int row, col;         // current row and column of rogue
+  int key;              // key pressed by user
 
   initialize_gui();
 

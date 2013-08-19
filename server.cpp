@@ -4,11 +4,11 @@
  *
  * Object oriented server implementation.
  *
- * Based on: http://www.gnu.org/software/libc/manual/html_node/Server-Example.html
+ * Based on:
+ *   http://www.gnu.org/software/libc/manual/html_node/Server-Example.html
  */
 
 #include <cstdlib>
-#include <cstring>
 #include <iostream>
 #include <cerrno>
 #include <unistd.h>
@@ -18,25 +18,12 @@
 #include <netinet/in.h>
 #include <netdb.h>
 
+#include "server.h"
+
 #define PORT    13375
 #define MSG_LEN 512
 
 using namespace std;
-
-class Server {
-  protected:
-    int listener; // file descriptor of listening socket
-    fd_set all_fds, read_fds;
-
-    int accept_connection();
-    int read_from_client(int fd);
-    void disconnect(int fd);
-    void fatal_error(string context);
-
-  public:
-    Server();
-    void run();
-};
 
 Server::Server() {
   struct sockaddr_in addr;
@@ -107,20 +94,26 @@ int Server::accept_connection() {
 }
 
 int Server::read_from_client(int fd) {
-  char msg[MSG_LEN];
+  char buffer[MSG_LEN];
   int num_bytes;
 
-  num_bytes = read(fd, msg, MSG_LEN);
+  num_bytes = read(fd, buffer, MSG_LEN);
 
   if (num_bytes < 0) // something went wrong
     fatal_error("read");
   else if (num_bytes == 0) // the client disconnected
     return -1;
   else { // a message arrived!
-    msg[num_bytes] = 0; // null-terminate the message
-    cout << "MESSAGE: " << msg << flush;
+    string msg;
+    buffer[num_bytes] = 0; // null-terminate the message
+    msg = buffer;
+    handle_msg(msg);
     return 0;
   }
+}
+
+void Server::handle_msg(string msg) {
+  cout << "MESSAGE: " << msg << flush;
 }
 
 void Server::disconnect(int fd) {
