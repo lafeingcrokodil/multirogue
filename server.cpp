@@ -11,36 +11,43 @@
 #include <cstdlib>
 #include <iostream>
 #include <cerrno>
-#include <unistd.h>
-#include <sys/types.h>
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <netinet/in.h>
-#include <netdb.h>
 
 #include "server.h"
 
-#define PORT    13375
-#define MSG_LEN 512
+#define PORT 13375
 
 using namespace std;
 
-Server::Server() {
+/*
+int listener;
+fd_set all_fds, read_fds, client_fds;
+int accept_connection();
+int read_from_client(int fd);
+void disconnect(int fd);
+void fatal_error(string context);
+*/
+
+Server::Server(uint16_t port) {
   struct sockaddr_in addr;
 
   // create new socket
+  cout << "Creating new socket...\n";
   listener = socket(PF_INET, SOCK_STREAM, 0);
   if (listener < 0)
     fatal_error("socket");
 
   // bind the socket
+  cout << "Binding socket to port " << port << "...\n";
   addr.sin_family = AF_INET;
-  addr.sin_port = htons(PORT);
+  addr.sin_port = htons(port);
   addr.sin_addr.s_addr = htonl(INADDR_ANY);
   if (bind(listener, (struct sockaddr *) &addr, sizeof(addr)) < 0)
     fatal_error("bind");
 
   // start listening
+  cout << "Listening...\n";
   if (listen(listener, 1) < 0)
     fatal_error("listen");
 
@@ -51,6 +58,7 @@ Server::Server() {
 void Server::run() {
   int i;
 
+  cout << "Starting endless serving loop of joy...\n";
   while (true) {
     read_fds = all_fds;
 
@@ -73,6 +81,10 @@ void Server::run() {
   }
 }
 
+fd_set Server::get_client_fds() {
+  return client_fds;
+}
+
 int Server::accept_connection() {
   struct sockaddr_in client_addr;
   socklen_t addr_len = sizeof(client_addr);
@@ -89,6 +101,7 @@ int Server::accept_connection() {
 
   // add new file descriptor to set
   FD_SET(new_fd, &all_fds);
+  FD_SET(new_fd, &client_fds);
 
   return 0;
 }
@@ -128,7 +141,7 @@ void Server::fatal_error(string context) {
 }
 
 int main() {
-  Server server;
+  Server server(PORT);
   server.run();
 }
 

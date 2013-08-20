@@ -1,0 +1,53 @@
+=====================================================================
+PROJECT NOTES
+=====================================================================
+
+=====================================================================
+17.08.2013
+---------------------------------------------------------------------
+- set up Ubuntu
+- experiment with ncurses library
+- write program that allows user to move rogue around the screen
+- reacquaint self with socket programming (using select)
+=====================================================================
+
+=====================================================================
+18.08.2013
+---------------------------------------------------------------------
+- write object oriented version of basic server example from internet
+=====================================================================
+
+=====================================================================
+19.08.2013
+---------------------------------------------------------------------
+- set up gedit (vim is too annoying after all)
+- rename test.cpp and write comments for it
+- move declaration of Server class to a header file
+- find out how to compile code when there are multiple files
+=====================================================================
+
+=====================================================================
+20.08.2013
+---------------------------------------------------------------------
+- decide what should really belong to class declaration in server.h
+- add/modify console output of server
+- write basic client class that will be used instead of telnet
+=====================================================================
+
+=====================================================================
+21.08.2013
+---------------------------------------------------------------------
+- ...
+=====================================================================
+
+=====================================================================
+TODO
+---------------------------------------------------------------------
+- add IPv6 support to basic client
+- solve "connection refused" problem if it persists
+- write subclass MultiRogueServer
+- write subclass MultiRogueClient that uses ncurses
+- get program to the point that players can move their rogues around
+  the screen and see the movements of the other rogues
+- enable movement with NUMPAD as well (5: don't move)
+=====================================================================
