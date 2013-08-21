@@ -37,16 +37,16 @@ PROJECT NOTES
 =====================================================================
 21.08.2013
 ---------------------------------------------------------------------
-- ...
+- remove unnecessary forward declarations in server.cpp
+- solve "connection refused" problem [htons(port), not just port]
 =====================================================================
 
 =====================================================================
 TODO
 ---------------------------------------------------------------------
-- add IPv6 support to basic client
-- solve "connection refused" problem if it persists
-- write subclass MultiRogueServer
-- write subclass MultiRogueClient that uses ncurses
+- try to figure out how derived classes/headers/includes work
+- write derived class MultiRogueServer
+- write derived class MultiRogueClient that uses ncurses
 - get program to the point that players can move their rogues around
   the screen and see the movements of the other rogues
 - enable movement with NUMPAD as well (5: don't move)

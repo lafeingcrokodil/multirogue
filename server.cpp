@@ -20,15 +20,6 @@
 
 using namespace std;
 
-/*
-int listener;
-fd_set all_fds, read_fds, client_fds;
-int accept_connection();
-int read_from_client(int fd);
-void disconnect(int fd);
-void fatal_error(string context);
-*/
-
 Server::Server(uint16_t port) {
   struct sockaddr_in addr;
 
@@ -126,7 +117,7 @@ int Server::read_from_client(int fd) {
 }
 
 void Server::handle_msg(string msg) {
-  cout << "MESSAGE: " << msg << flush;
+  cout << "MESSAGE: " << msg << "\n";
 }
 
 void Server::disconnect(int fd) {
@@ -136,7 +127,7 @@ void Server::disconnect(int fd) {
 }
 
 void Server::fatal_error(string context) {
-  cerr << context << ": " << strerror(errno);
+  cerr << context << ": " << strerror(errno) << "\n";
   exit(EXIT_FAILURE);
 }
 

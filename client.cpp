@@ -32,7 +32,7 @@ Client::Client(const char *ip, uint16_t port) {
 
   // get server socket address
   server_addr.sin_family = AF_INET;
-  server_addr.sin_port = port;
+  server_addr.sin_port = htons(port);
   inet_pton(AF_INET, ip, &(server_addr.sin_addr));
 
   // connect to server
@@ -49,7 +49,7 @@ void Client::run() {
   char msg[] = "Greetings!";
   int num_bytes;
 
-  cout << "SENDING: " << msg << flush;
+  cout << "SENDING: " << msg << "\n";
   num_bytes = write(fd, msg, strlen(msg) + 1);
   if (num_bytes < 0)
     fatal_error("write");
@@ -58,7 +58,7 @@ void Client::run() {
 }
 
 void Client::fatal_error(string context) {
-  cerr << context << ": " << strerror(errno);
+  cerr << context << ": " << strerror(errno) << "\n";
   exit(EXIT_FAILURE);
 }
 
