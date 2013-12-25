@@ -42,7 +42,7 @@ PROJECT NOTES
 =====================================================================
 
 =====================================================================
-TODO
+C++ TODO
 ---------------------------------------------------------------------
 - try to figure out how derived classes/headers/includes work
 - write derived class MultiRogueServer
@@ -50,4 +50,11 @@ TODO
 - get program to the point that players can move their rogues around
   the screen and see the movements of the other rogues
 - enable movement with NUMPAD as well (5: don't move)
+=====================================================================
+
+=====================================================================
+25.12.2013
+---------------------------------------------------------------------
+- decided not to use C++ and the curses library
+- using node.js and the HTML5 canvas instead (-> browser game)
 =====================================================================
