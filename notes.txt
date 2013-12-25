@@ -57,4 +57,10 @@ C++ TODO
 ---------------------------------------------------------------------
 - decided not to use C++ and the curses library
 - using node.js and the HTML5 canvas instead (-> browser game)
+- created basic index page (only contains centred game screen)
+- started work on client script (multirogue.coffee)
+  - Screen class: used to display characters on game screen
+- useful commands:
+  - installing packages: npm install <pkg> --save
+  - compiling CoffeeScript: coffee -w -c -o js/ coffee/
 =====================================================================

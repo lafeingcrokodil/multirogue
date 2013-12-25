@@ -1,0 +1,20 @@
+{
+  "name": "multirogue",
+  "version": "0.1.0",
+  "author": "lafeingcrokodil <tvhtoo@gmail.com>",
+  "description": "a multiplayer version of Rogue",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lafeingcrokodil/multirogue.git"
+  },
+  "keywords": [
+    "rogue",
+    "rpg",
+    "role-playing game",
+    "dungeon crawler",
+    "multiplayer"
+  ],
+  "dependencies": {
+    "coffee-script": "~1.6.3"
+  }
+}
