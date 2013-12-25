@@ -28,4 +28,7 @@ class Screen
 
 $(document).ready ->
   screen = new Screen $('#screen')[0]
-  screen.display '@', 0, 0
+
+  socket = io.connect "http://#{window.location.hostname}:13375"
+  socket.on 'display', (data) ->
+    screen.display data.char, data.x, data.y

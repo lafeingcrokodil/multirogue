@@ -60,6 +60,8 @@ C++ TODO
 - created basic index page (only contains centred game screen)
 - started work on client script (multirogue.coffee)
   - Screen class: used to display characters on game screen
+- wrote very basic server using express and socket.io
+  - tells clients to display @ symbol at position (0,0)
 - useful commands:
   - installing packages: npm install <pkg> --save
   - compiling CoffeeScript: coffee -w -c -o js/ coffee/

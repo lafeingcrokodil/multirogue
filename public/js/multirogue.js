@@ -38,9 +38,12 @@
   })();
 
   $(document).ready(function() {
-    var screen;
+    var screen, socket;
     screen = new Screen($('#screen')[0]);
-    return screen.display('@', 0, 0);
+    socket = io.connect("http://" + window.location.hostname + ":13375");
+    return socket.on('display', function(data) {
+      return screen.display(data.char, data.x, data.y);
+    });
   });
 
 }).call(this);
