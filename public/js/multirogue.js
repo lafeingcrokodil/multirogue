@@ -6,13 +6,15 @@
   Screen = (function() {
     function Screen(canvas) {
       this.display = __bind(this.display, this);
+      this.getY = __bind(this.getY, this);
+      this.getX = __bind(this.getX, this);
       this.getCharWidth = __bind(this.getCharWidth, this);
       this.getFont = __bind(this.getFont, this);
       this.context = canvas.getContext('2d');
       this.charHeight = 12;
       this.charWidth = this.getCharWidth();
       canvas.width = 80 * this.charWidth;
-      canvas.height = 24 * this.charHeight;
+      canvas.height = 24 * this.charHeight + 1;
       this.context.font = this.getFont();
       this.context.fillStyle = '#FFFFFF';
     }
@@ -26,11 +28,17 @@
       return this.context.measureText('x').width;
     };
 
+    Screen.prototype.getX = function(x) {
+      return x * this.charWidth;
+    };
+
+    Screen.prototype.getY = function(y) {
+      return (y + 1) * this.charHeight;
+    };
+
     Screen.prototype.display = function(char, x, y) {
-      var actualX, actualY;
-      actualX = x * this.charWidth;
-      actualY = (y + 1) * this.charHeight;
-      return this.context.fillText(char, actualX, actualY);
+      this.context.clearRect(this.getX(x), this.getY(y - 1) + 1, this.charWidth, this.charHeight);
+      return this.context.fillText(char, this.getX(x), this.getY(y));
     };
 
     return Screen;
@@ -40,9 +48,13 @@
   $(document).ready(function() {
     var screen, socket;
     screen = new Screen($('#screen')[0]);
-    socket = io.connect("http://" + window.location.hostname + ":13375");
-    return socket.on('display', function(data) {
+    socket = io.connect("http://" + location.hostname + ":" + location.port);
+    socket.on('display', function(data) {
       return screen.display(data.char, data.x, data.y);
+    });
+    return $(document).keydown(function(e) {
+      socket.emit('key', e.which);
+      return e.preventDefault();
     });
   });
 

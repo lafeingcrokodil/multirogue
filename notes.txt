@@ -66,3 +66,13 @@ C++ TODO
   - installing packages: npm install <pkg> --save
   - compiling CoffeeScript: coffee -w -c -o js/ coffee/
 =====================================================================
+
+=====================================================================
+26.12.2013
+---------------------------------------------------------------------
+- cleaned up app.coffee and created MultiRogueServer class
+- players can now move @ symbol around the screen
+- both classic Rogue movement keys and numpad keys work
+- created keyCodes.json to store key -> code mapping
+  (cambiaresearch.com/articles/15/javascript-char-codes-key-codes)
+=====================================================================

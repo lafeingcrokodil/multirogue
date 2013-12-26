@@ -9,7 +9,7 @@ class Screen
 
     # resize canvas according to character dimensions
     canvas.width = 80 * @charWidth
-    canvas.height = 24 * @charHeight
+    canvas.height = 24 * @charHeight + 1
 
     # set font (including size and colour)
     @context.font = @getFont()
@@ -21,14 +21,21 @@ class Screen
     @context.font = @getFont()
     return @context.measureText('x').width
 
+  getX: (x) => x * @charWidth
+
+  getY: (y) => (y + 1) * @charHeight
+
   display: (char, x, y) =>
-    actualX = x * @charWidth
-    actualY = (y + 1) * @charHeight
-    @context.fillText char, actualX, actualY
+    @context.clearRect @getX(x), @getY(y-1) + 1, @charWidth, @charHeight
+    @context.fillText char, @getX(x), @getY(y)
 
 $(document).ready ->
   screen = new Screen $('#screen')[0]
 
-  socket = io.connect "http://#{window.location.hostname}:13375"
+  socket = io.connect "http://#{location.hostname}:#{location.port}"
   socket.on 'display', (data) ->
     screen.display data.char, data.x, data.y
+
+  $(document).keydown (e) ->
+    socket.emit 'key', e.which
+    e.preventDefault()
