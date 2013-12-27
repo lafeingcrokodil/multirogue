@@ -5,7 +5,7 @@
   "SHIFT": 16,
   "CTRL": 17,
   "ALT": 18,
-  "PAUSE/BREAK": 19,
+  "PAUSE_BREAK": 19,
   "CAPS_LOCK": 20,
   "ESCAPE": 27,
   "PAGE_UP": 33,
@@ -86,7 +86,7 @@
   "F12": 123,
   "NUM_LOCK": 144,
   "SCROLL_LOCK": 145,
-  "SEMI-COLON": 186,
+  "SEMICOLON": 186,
   "EQUAL_SIGN": 187,
   "COMMA": 188,
   "DASH": 189,
@@ -95,6 +95,6 @@
   "GRAVE_ACCENT": 192,
   "OPEN_BRACKET": 219,
   "BACK_SLASH": 220,
-  "CLOSE_BRAKET": 221,
+  "CLOSE_BRACKET": 221,
   "SINGLE_QUOTE": 222
 }

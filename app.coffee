@@ -4,6 +4,9 @@ express          = require 'express'
 socketio         = require 'socket.io'
 MultiRogueServer = require './server/MultiRogueServer'
 
+console.log '=== MULTIROGUE SERVER ==='
+console.log 'Setting up server...'
+
 # set up app
 app = express()
 app.set 'port', process.env.PORT or 13375

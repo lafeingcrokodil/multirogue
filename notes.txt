@@ -75,14 +75,20 @@ C++ TODO
 - both classic Rogue movement keys and numpad keys work
 - created keyCodes.json to store key -> code mapping
   (cambiaresearch.com/articles/15/javascript-char-codes-key-codes)
-=====================================================================
-
-=====================================================================
-27.12.2013
----------------------------------------------------------------------
 - added map support
 - added basic symbol dictionary (ROGUE: @, DOOR: +, etc.)
 - rogues are properly removed from game upon disconnecting
 - switched from (x, y) to (row, col) coordinates
 - front end: made background black
+=====================================================================
+
+=====================================================================
+27.12.2013
+---------------------------------------------------------------------
+- movement is now turn-based
+- added "don't move" key support (classic: period, numpad: 5)
+- harmless heat-seeking emus now spawn every 10 turns
+- added monsters to symbol dictionary
+- server is now a little more verbose (w.r.t. console output)
+- made slight changes to some key names in key -> code mapping
 =====================================================================
