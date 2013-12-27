@@ -1,6 +1,6 @@
 class Screen
 
-  constructor: (canvas) ->
+  constructor: (canvas, rows, cols) ->
     @context = canvas.getContext '2d'
 
     # get character dimensions
@@ -8,8 +8,8 @@ class Screen
     @charWidth = @getCharWidth()
 
     # resize canvas according to character dimensions
-    canvas.width = 80 * @charWidth
-    canvas.height = 24 * @charHeight + 1
+    canvas.width = cols * @charWidth
+    canvas.height = (rows + 2) * @charHeight
 
     # set font (including size and colour)
     @context.font = @getFont()
@@ -21,20 +21,28 @@ class Screen
     @context.font = @getFont()
     return @context.measureText('x').width
 
-  getX: (x) => x * @charWidth
+  getX: (col) => col * @charWidth
 
-  getY: (y) => (y + 1) * @charHeight
+  getY: (row) => (row + 1) * @charHeight
 
-  display: (char, x, y) =>
-    @context.clearRect @getX(x), @getY(y-1) + 1, @charWidth, @charHeight
-    @context.fillText char, @getX(x), @getY(y)
+  display: (char, row, col) =>
+    @context.clearRect @getX(col), @getY(row-1) + 1, @charWidth, @charHeight
+    @context.fillText char, @getX(col), @getY(row)
+
+  displayMap: (map) =>
+    for mapRow, row in map
+      for char, col in mapRow
+        @display char, row, col
 
 $(document).ready ->
-  screen = new Screen $('#screen')[0]
-
   socket = io.connect "http://#{location.hostname}:#{location.port}"
-  socket.on 'display', (data) ->
-    screen.display data.char, data.x, data.y
+
+  socket.on 'map', (mapData) ->
+    screen = new Screen $('#screen')[0], mapData.rows, mapData.cols
+    $('#screen').css 'display', 'block' # make screen visible
+    screen.displayMap mapData.map
+    socket.on 'display', (data) ->
+      screen.display data.char, data.row, data.col
 
   $(document).keydown (e) ->
     socket.emit 'key', e.which

@@ -1,6 +1,10 @@
+body {
+  background-color: black;
+}
+
 #screen {
   margin: 0 auto;
   padding: 0;
-  display: block;
+  display: none;
   background-color: black;
 }

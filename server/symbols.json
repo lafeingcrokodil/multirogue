@@ -1,0 +1,10 @@
+{
+  "ROGUE": "@",
+  "GROUND": ".",
+  "DOOR": "+",
+  "PASSAGE": "#",
+  "TRAP": "^",
+  "H_WALL": "-",
+  "V_WALL": "|",
+  "NO_MANS_LAND": " "
+}

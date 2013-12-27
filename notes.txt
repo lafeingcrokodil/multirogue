@@ -76,3 +76,13 @@ C++ TODO
 - created keyCodes.json to store key -> code mapping
   (cambiaresearch.com/articles/15/javascript-char-codes-key-codes)
 =====================================================================
+
+=====================================================================
+27.12.2013
+---------------------------------------------------------------------
+- added map support
+- added basic symbol dictionary (ROGUE: @, DOOR: +, etc.)
+- rogues are properly removed from game upon disconnecting
+- switched from (x, y) to (row, col) coordinates
+- front end: made background black
+=====================================================================

@@ -4,7 +4,8 @@
     __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Screen = (function() {
-    function Screen(canvas) {
+    function Screen(canvas, rows, cols) {
+      this.displayMap = __bind(this.displayMap, this);
       this.display = __bind(this.display, this);
       this.getY = __bind(this.getY, this);
       this.getX = __bind(this.getX, this);
@@ -13,8 +14,8 @@
       this.context = canvas.getContext('2d');
       this.charHeight = 12;
       this.charWidth = this.getCharWidth();
-      canvas.width = 80 * this.charWidth;
-      canvas.height = 24 * this.charHeight + 1;
+      canvas.width = cols * this.charWidth;
+      canvas.height = (rows + 2) * this.charHeight;
       this.context.font = this.getFont();
       this.context.fillStyle = '#FFFFFF';
     }
@@ -28,17 +29,35 @@
       return this.context.measureText('x').width;
     };
 
-    Screen.prototype.getX = function(x) {
-      return x * this.charWidth;
+    Screen.prototype.getX = function(col) {
+      return col * this.charWidth;
     };
 
-    Screen.prototype.getY = function(y) {
-      return (y + 1) * this.charHeight;
+    Screen.prototype.getY = function(row) {
+      return (row + 1) * this.charHeight;
     };
 
-    Screen.prototype.display = function(char, x, y) {
-      this.context.clearRect(this.getX(x), this.getY(y - 1) + 1, this.charWidth, this.charHeight);
-      return this.context.fillText(char, this.getX(x), this.getY(y));
+    Screen.prototype.display = function(char, row, col) {
+      this.context.clearRect(this.getX(col), this.getY(row - 1) + 1, this.charWidth, this.charHeight);
+      return this.context.fillText(char, this.getX(col), this.getY(row));
+    };
+
+    Screen.prototype.displayMap = function(map) {
+      var char, col, mapRow, row, _i, _len, _results;
+      _results = [];
+      for (row = _i = 0, _len = map.length; _i < _len; row = ++_i) {
+        mapRow = map[row];
+        _results.push((function() {
+          var _j, _len1, _results1;
+          _results1 = [];
+          for (col = _j = 0, _len1 = mapRow.length; _j < _len1; col = ++_j) {
+            char = mapRow[col];
+            _results1.push(this.display(char, row, col));
+          }
+          return _results1;
+        }).call(this));
+      }
+      return _results;
     };
 
     return Screen;
@@ -46,11 +65,16 @@
   })();
 
   $(document).ready(function() {
-    var screen, socket;
-    screen = new Screen($('#screen')[0]);
+    var socket;
     socket = io.connect("http://" + location.hostname + ":" + location.port);
-    socket.on('display', function(data) {
-      return screen.display(data.char, data.x, data.y);
+    socket.on('map', function(mapData) {
+      var screen;
+      screen = new Screen($('#screen')[0], mapData.rows, mapData.cols);
+      $('#screen').css('display', 'block');
+      screen.displayMap(mapData.map);
+      return socket.on('display', function(data) {
+        return screen.display(data.char, data.row, data.col);
+      });
     });
     return $(document).keydown(function(e) {
       socket.emit('key', e.which);
