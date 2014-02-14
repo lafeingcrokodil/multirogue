@@ -1,6 +1,8 @@
 fs   = require 'fs'
 path = require 'path'
 
+Map  = require './Map'
+
 class MultiRogueServer
   module.exports = MultiRogueServer
 
@@ -15,36 +17,7 @@ class MultiRogueServer
     keyCodeStr = fs.readFileSync path.join('server', 'keyCodes.json'), 'utf8'
     @keyCodes = JSON.parse keyCodeStr
 
-    # load symbol dictionary
-    symbolStr = fs.readFileSync path.join('server', 'symbols.json'), 'utf8'
-    @symbols = JSON.parse symbolStr
-
-    @loadTerrain 'oneRoom'
-
-  loadTerrain: (mapName) =>
-    # load map file
-    mapFile = fs.readFileSync path.join('server', 'maps', "#{mapName}.txt"), 'utf8'
-
-    # initialize map with terrain
-    @map = []
-    for row in mapFile.split /[\r\n]+/
-      mapRow = []
-      for char in row
-        mapRow.push { terrain: char }
-      @map.push mapRow
-
-    # calculate map size
-    @mapRows = @map.length
-    @mapCols = @map[0].length
-
-  getSimpleMap: =>
-    map = []
-    for row in @map
-      mapRow = []
-      for pos in row
-        mapRow.push (if pos.occupant then @symbols[pos.occupant.type] else pos.terrain)
-      map.push mapRow
-    return map
+    @map = new Map
 
   broadcast: (event, data) =>
     for rogue in @rogues
@@ -52,7 +25,7 @@ class MultiRogueServer
 
   handleConnection: (socket) =>
     rogue = @addRogue socket
-    socket.emit 'map', { map: @getSimpleMap(), rows: @mapRows, cols: @mapCols }
+    socket.emit 'map', { map: @map.getSnapshot(), rows: @map.rows, cols: @map.cols }
     socket.on 'key', @handleKeyEvent(rogue)
     socket.on 'disconnect', @removeRogue(rogue)
 
@@ -82,8 +55,7 @@ class MultiRogueServer
   addRogue: (socket) =>
     console.log "[#{socket.handshake.address.address}] Rogue joined."
     newRogue = { socket, type: 'ROGUE', canMove: true }
-    { row, col } = @getRandomSpawnPos()
-    @occupy row, col, newRogue
+    @occupy newRogue
     @rogues.push newRogue
     return newRogue
 
@@ -91,40 +63,21 @@ class MultiRogueServer
     console.log "[#{rogue.socket.handshake.address.address}] Rogue left."
     index = @rogues.indexOf rogue
     @rogues.splice index, 1
-    @removeOccupant rogue.row, rogue.col
+    @unoccupy rogue.row, rogue.col
 
   spawnMonster: (type) =>
     newMonster = { type, canMove: true }
-    { row, col } = @getRandomSpawnPos()
-    @occupy row, col, newMonster
+    @occupy newMonster
     @monsters.push newMonster
-
-  getRandomSpawnPos: =>
-    loop # trial and error
-      row = Math.floor (@mapRows * Math.random())
-      col = Math.floor (@mapCols * Math.random())
-      break if @isValid row, col
-    return { row, col }
-
-  isValid: (row, col) =>
-    inBounds = 0 <= row < @mapRows and 0 <= col < @mapCols
-    terrainOK = @map[row][col].terrain in [
-      @symbols.GROUND,
-      @symbols.DOOR,
-      @symbols.PASSAGE,
-      @symbols.TRAP
-    ]
-    notOccupied = not @map[row][col].occupant
-    return inBounds and terrainOK and notOccupied
 
   move: (creature, dRow, dCol) =>
     return unless creature.canMove
     oldPos = { row: creature.row, col: creature.col }
     newPos = { row: oldPos.row + dRow, col: oldPos.col + dCol }
-    return unless @isValid newPos.row, newPos.col
+    return unless @map.isValid newPos.row, newPos.col
     creature.canMove = false if creature.type is 'ROGUE'
-    @removeOccupant oldPos.row, oldPos.col
-    @occupy newPos.row, newPos.col, creature
+    @unoccupy oldPos.row, oldPos.col
+    @occupy creature, newPos.row, newPos.col
     do @handleEndMove if creature.type is 'ROGUE'
 
   moveMonsters: =>
@@ -138,15 +91,13 @@ class MultiRogueServer
   compare: (a, b) =>
     if a < b then -1 else if a > b then 1 else 0
 
-  removeOccupant: (row, col) =>
-    @map[row][col].occupant = false
-    @broadcast 'display', { char: @map[row][col].terrain, row, col }
+  occupy: (occupant, row, col) =>
+    { char, row, col } = @map.occupy occupant, row, col
+    @broadcast 'display', { char, row, col }
 
-  occupy: (row, col, occupant) =>
-    @map[row][col].occupant = occupant
-    occupant.row = row
-    occupant.col = col
-    @broadcast 'display', { char: @symbols[occupant.type], row, col }
+  unoccupy: (row, col) =>
+    { char } = @map.unoccupy row, col
+    @broadcast 'display', { char, row, col }
 
   handleEndMove: =>
     if (++@movedCount) is @rogues.length
