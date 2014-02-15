@@ -1,7 +1,5 @@
-fs   = require 'fs'
-path = require 'path'
-
-Map  = require './Map'
+Map             = require './Map'
+KeyEventHandler = require './KeyEventHandler'
 
 class MultiRogueServer
   module.exports = MultiRogueServer
@@ -13,11 +11,8 @@ class MultiRogueServer
   turnCount: 0
 
   constructor: ->
-    # load key code mapping
-    keyCodeStr = fs.readFileSync path.join('server', 'keyCodes.json'), 'utf8'
-    @keyCodes = JSON.parse keyCodeStr
-
     @map = new Map
+    @keyEventHandler = new KeyEventHandler @
 
   broadcast: (event, data) =>
     for rogue in @rogues
@@ -26,31 +21,8 @@ class MultiRogueServer
   handleConnection: (socket) =>
     rogue = @addRogue socket
     socket.emit 'map', { map: @map.getSnapshot(), rows: @map.rows, cols: @map.cols }
-    socket.on 'key', @handleKeyEvent(rogue)
+    socket.on 'key', @keyEventHandler.handle(rogue)
     socket.on 'disconnect', @removeRogue(rogue)
-
-  handleKeyEvent: (rogue) => (code) =>
-    switch code
-      when @keyCodes.H, @keyCodes.NUMPAD_4
-        @move rogue, 0, -1
-      when @keyCodes.L, @keyCodes.NUMPAD_6
-        @move rogue, 0, 1
-      when @keyCodes.K, @keyCodes.NUMPAD_8
-        @move rogue, -1, 0
-      when @keyCodes.J, @keyCodes.NUMPAD_2
-        @move rogue, 1, 0
-      when @keyCodes.Y, @keyCodes.NUMPAD_7
-        @move rogue, -1, -1
-      when @keyCodes.U, @keyCodes.NUMPAD_9
-        @move rogue, -1, 1
-      when @keyCodes.B, @keyCodes.NUMPAD_1
-        @move rogue, 1, -1
-      when @keyCodes.N, @keyCodes.NUMPAD_3
-        @move rogue, 1, 1
-      when @keyCodes.PERIOD, @keyCodes.NUMPAD_5
-        if rogue.canMove
-          rogue.canMove = false
-          do @handleEndMove
 
   addRogue: (socket) =>
     console.log "[#{socket.handshake.address.address}] Rogue joined."
@@ -72,13 +44,15 @@ class MultiRogueServer
 
   move: (creature, dRow, dCol) =>
     return unless creature.canMove
-    oldPos = { row: creature.row, col: creature.col }
-    newPos = { row: oldPos.row + dRow, col: oldPos.col + dCol }
-    return unless @map.isValid newPos.row, newPos.col
-    creature.canMove = false if creature.type is 'ROGUE'
-    @unoccupy oldPos.row, oldPos.col
-    @occupy creature, newPos.row, newPos.col
-    do @handleEndMove if creature.type is 'ROGUE'
+    if dRow or dCol
+      oldPos = { row: creature.row, col: creature.col }
+      newPos = { row: oldPos.row + dRow, col: oldPos.col + dCol }
+      return unless @map.isValid newPos.row, newPos.col
+      @unoccupy oldPos.row, oldPos.col
+      @occupy creature, newPos.row, newPos.col
+    if creature.type is 'ROGUE'
+      creature.canMove = false
+      do @handleEndMove
 
   moveMonsters: =>
     for monster, i in @monsters

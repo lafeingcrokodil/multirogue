@@ -99,11 +99,6 @@ C++ TODO
 - began refactoring server code based on previous refactoring attempt
 - created new Map class
 - moved map-related code from MultiRogueServer to Map
-=====================================================================
-
-=====================================================================
-NEXT STEPS
----------------------------------------------------------------------
-- write KeyEventHandler class
-- think about how to modularize other things, like the monster AI
+- moved key event handling code to new KeyEventHandler class
+- rearranged and added some comments to Map class
 =====================================================================
