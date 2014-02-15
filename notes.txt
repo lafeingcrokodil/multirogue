@@ -92,3 +92,18 @@ C++ TODO
 - server is now a little more verbose (w.r.t. console output)
 - made slight changes to some key names in key -> code mapping
 =====================================================================
+
+=====================================================================
+15.02.2014
+---------------------------------------------------------------------
+- began refactoring server code based on previous refactoring attempt
+- created new Map class
+- moved map-related code from MultiRogueServer to Map
+=====================================================================
+
+=====================================================================
+NEXT STEPS
+---------------------------------------------------------------------
+- write KeyEventHandler class
+- think about how to modularize other things, like the monster AI
+=====================================================================
