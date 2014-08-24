@@ -59,7 +59,7 @@ class Map
     loop # trial and error
       row = Math.floor (@rows * Math.random())
       col = Math.floor (@cols * Math.random())
-      break if @isValid row, col
+      break if @isValid(row, col) and not @getOccupant(row, col)
     return { row, col }
 
   isValid: (row, col) =>
@@ -70,8 +70,10 @@ class Map
       @symbols.PASSAGE,
       @symbols.TRAP
     ]
-    notOccupied = not @tiles[row][col].occupant
-    return inBounds and terrainOK and notOccupied
+    return inBounds and terrainOK
+
+  getOccupant: (row, col) =>
+    return @tiles[row][col].occupant
 
   ###
   Returns a two-dimensional array containing the symbols

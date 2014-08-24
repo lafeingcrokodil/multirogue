@@ -108,3 +108,14 @@ C++ TODO
 ---------------------------------------------------------------------
 - added Procfile to enable deployment to Heroku
 =====================================================================
+
+=====================================================================
+24.08.2014
+---------------------------------------------------------------------
+- using scripts property of package.json instead of Procfile
+- to start the app: npm start
+- added hp property to creature objects
+- stats (just HP for now) displayed under map
+- rogues can now attack monsters and vice versa (no PvP, though)
+- each attack decreases the victim's HP by 1
+=====================================================================

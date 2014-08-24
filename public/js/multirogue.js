@@ -5,17 +5,20 @@
 
   Screen = (function() {
     function Screen(canvas, rows, cols) {
+      this.rows = rows;
+      this.cols = cols;
       this.displayMap = __bind(this.displayMap, this);
+      this.displayStats = __bind(this.displayStats, this);
       this.display = __bind(this.display, this);
       this.getY = __bind(this.getY, this);
       this.getX = __bind(this.getX, this);
-      this.getCharWidth = __bind(this.getCharWidth, this);
+      this.getTextWidth = __bind(this.getTextWidth, this);
       this.getFont = __bind(this.getFont, this);
       this.context = canvas.getContext('2d');
       this.charHeight = 12;
-      this.charWidth = this.getCharWidth();
-      canvas.width = cols * this.charWidth;
-      canvas.height = (rows + 2) * this.charHeight;
+      this.charWidth = this.getTextWidth('x');
+      this.width = canvas.width = cols * this.charWidth;
+      this.height = canvas.height = (rows + 2) * this.charHeight;
       this.context.font = this.getFont();
       this.context.fillStyle = '#FFFFFF';
     }
@@ -24,9 +27,9 @@
       return "" + this.charHeight + "px Courier New";
     };
 
-    Screen.prototype.getCharWidth = function() {
+    Screen.prototype.getTextWidth = function(text) {
       this.context.font = this.getFont();
-      return this.context.measureText('x').width;
+      return this.context.measureText(text).width;
     };
 
     Screen.prototype.getX = function(col) {
@@ -37,9 +40,14 @@
       return (row + 1) * this.charHeight;
     };
 
-    Screen.prototype.display = function(char, row, col) {
-      this.context.clearRect(this.getX(col), this.getY(row - 1) + 1, this.charWidth, this.charHeight);
-      return this.context.fillText(char, this.getX(col), this.getY(row));
+    Screen.prototype.display = function(text, row, col) {
+      this.context.clearRect(this.getX(col), this.getY(row - 1) + 1, this.getTextWidth(text), this.charHeight);
+      return this.context.fillText(text, this.getX(col), this.getY(row));
+    };
+
+    Screen.prototype.displayStats = function(text) {
+      this.context.clearRect(0, this.getY(this.rows - 1) + 1, this.width, this.charHeight);
+      return this.context.fillText(text, 0, this.getY(this.rows));
     };
 
     Screen.prototype.displayMap = function(map) {
@@ -72,8 +80,11 @@
       screen = new Screen($('#screen')[0], mapData.rows, mapData.cols);
       $('#screen').css('display', 'block');
       screen.displayMap(mapData.map);
-      return socket.on('display', function(data) {
+      socket.on('display', function(data) {
         return screen.display(data.char, data.row, data.col);
+      });
+      return socket.on('stats', function(data) {
+        return screen.displayStats("HP: " + data.hp);
       });
     });
     return $(document).keydown(function(e) {

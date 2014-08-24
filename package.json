@@ -1,6 +1,6 @@
 {
   "name": "multirogue",
-  "version": "0.4.2",
+  "version": "0.5.0",
   "author": "lafeingcrokodil <tvhtoo@gmail.com>",
   "description": "a multiplayer version of Rogue",
   "repository": {
@@ -14,9 +14,15 @@
     "dungeon crawler",
     "multiplayer"
   ],
+  "scripts": {
+    "start": "coffee app.coffee"
+  },
   "dependencies": {
     "coffee-script": "~1.6.3",
     "socket.io": "~0.9.16",
     "express": "~3.4.7"
+  },
+  "engines": {
+    "node": "0.10.x"
   }
 }
