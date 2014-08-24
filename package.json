@@ -1,6 +1,6 @@
 {
   "name": "multirogue",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "author": "lafeingcrokodil <tvhtoo@gmail.com>",
   "description": "a multiplayer version of Rogue",
   "repository": {
@@ -18,7 +18,7 @@
     "start": "coffee app.coffee"
   },
   "dependencies": {
-    "coffee-script": "~1.6.3",
+    "coffee-script": "~1.7.1",
     "socket.io": "~0.9.16",
     "express": "~3.4.7"
   },

@@ -118,4 +118,6 @@ C++ TODO
 - stats (just HP for now) displayed under map
 - rogues can now attack monsters and vice versa (no PvP, though)
 - each attack decreases the victim's HP by 1
+- added Procfile again (doesn't seem to work otherwise)
+- updated CoffeeScript version
 =====================================================================
