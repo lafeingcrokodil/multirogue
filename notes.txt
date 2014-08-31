@@ -121,3 +121,11 @@ C++ TODO
 - added Procfile again (doesn't seem to work otherwise)
 - updated CoffeeScript version
 =====================================================================
+
+=====================================================================
+31.08.2014
+---------------------------------------------------------------------
+- fixed bug that made players unable to move
+- fixed bug that made monsters continue to chase deceased rogues
+- fixed bug that let deceased rogues continue defeating monsters
+=====================================================================

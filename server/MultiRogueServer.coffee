@@ -4,8 +4,9 @@ KeyEventHandler = require './KeyEventHandler'
 class MultiRogueServer
   module.exports = MultiRogueServer
 
-  rogues: []
-  monsters: []
+  players  : [] # all players connected to the current game
+  rogues   : [] # living players
+  monsters : [] # living monsters
 
   movedCount: 0
   turnCount: 0
@@ -15,8 +16,8 @@ class MultiRogueServer
     @keyEventHandler = new KeyEventHandler @
 
   broadcast: (event, data) =>
-    for rogue in @rogues
-      rogue.socket.emit event, data
+    for player in @players
+      player.socket.emit event, data
 
   handleConnection: (socket) =>
     rogue = @addRogue socket
@@ -29,21 +30,27 @@ class MultiRogueServer
     console.log "[#{socket.handshake.address.address}] Rogue joined."
     newRogue = { socket, type: 'ROGUE', canMove: true, hp: 20 }
     @occupy newRogue
+    @players.push newRogue
     @rogues.push newRogue
     return newRogue
 
   removeRogue: (rogue) => () =>
     console.log "[#{rogue.socket.handshake.address.address}] Rogue left."
-    index = @rogues.indexOf rogue
-    @rogues.splice index, 1+
+    for list in [@rogues, @players]
+      index = list.indexOf rogue
+      list.splice index, 1 if index >= 0
     @unoccupy rogue.row, rogue.col
+    if @rogues.every((rogue) -> not rogue.canMove)
+      do @handleNewTurn
 
   handleDefeat: (creature) =>
     if creature.type is 'ROGUE'
       creature.canMove = false
+      list = @rogues
     else
-      index = @monsters.indexOf creature
-      @monsters.splice index, 1
+      list = @monsters
+    index = list.indexOf creature
+    list.splice index, 1
     @unoccupy creature.row, creature.col
 
   spawnMonster: (type) =>
@@ -68,7 +75,8 @@ class MultiRogueServer
         @occupy creature, newPos.row, newPos.col
     if creature.type is 'ROGUE'
       creature.canMove = false
-      do @handleEndMove
+      if (++@movedCount) is @rogues.length
+        do @handleNewTurn
 
   moveMonsters: =>
     for monster, i in @monsters
@@ -100,15 +108,11 @@ class MultiRogueServer
     { char } = @map.unoccupy row, col
     @broadcast 'display', { char, row, col }
 
-  handleEndMove: =>
-    if (++@movedCount) is @rogues.length
-      do @handleNewTurn
-      @movedCount = 0
-      for rogue in @rogues
-        rogue.canMove = true
-
   handleNewTurn: =>
     @turnCount++
     if @turnCount % 10 is 0
       @spawnMonster 'EMU'
     do @moveMonsters
+    @movedCount = 0
+    for rogue in @rogues
+      rogue.canMove = true
