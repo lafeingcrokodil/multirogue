@@ -39,7 +39,7 @@ class Screen
         @display char, row, col
 
 $(document).ready ->
-  socket = io.connect "http://#{location.hostname}:#{location.port}"
+  socket = io.connect "//#{location.host}"
 
   socket.on 'map', (mapData) ->
     screen = new Screen $('#screen')[0], mapData.rows, mapData.cols

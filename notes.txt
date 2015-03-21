@@ -135,4 +135,5 @@ C++ TODO
 ---------------------------------------------------------------------
 - started using Cloud9
 - added all hidden files (except .gitignore itself) to .gitignore
+- fixed "mixed content" bug (http vs. https)
 =====================================================================
