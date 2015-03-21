@@ -129,3 +129,10 @@ C++ TODO
 - fixed bug that made monsters continue to chase deceased rogues
 - fixed bug that let deceased rogues continue defeating monsters
 =====================================================================
+
+=====================================================================
+21.03.2015
+---------------------------------------------------------------------
+- started using Cloud9
+- added all hidden files (except .gitignore itself) to .gitignore
+=====================================================================
