@@ -1,7 +1,8 @@
-path             = require 'path'
-http             = require 'http'
-express          = require 'express'
-socketio         = require 'socket.io'
+path     = require 'path'
+http     = require 'http'
+express  = require 'express'
+socketIO = require 'socket.io'
+
 MultiRogueServer = require './server/MultiRogueServer'
 
 console.log '=== MULTIROGUE SERVER ==='
@@ -15,13 +16,12 @@ app.use express.static path.join __dirname, 'public'
 # create server
 server = http.createServer app
 
-# attach io to server (log only errors and warnings)
-io = socketio.listen server, { 'log level': 1 }
+# attach io to server
+io = socketIO server
 
 # set up game server
 multirogueServer = new MultiRogueServer io
 
 # start listening for connections
-server.listen app.get('port')
-io.sockets.on 'connection', multirogueServer.handleConnection
-console.log "Listening on port #{app.get('port')}."
+server.listen app.get('port'), ->
+  console.log "Listening on port #{app.get('port')}."

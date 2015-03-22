@@ -11,13 +11,16 @@ class MultiRogueServer
   movedCount: 0
   turnCount: 0
 
-  constructor: ->
+  constructor: (@io) ->
     @map = new Map
     @keyEventHandler = new KeyEventHandler @
+    @io.sockets.on 'connection', @handleConnection
 
   broadcast: (event, data) =>
-    for player in @players
-      player.socket.emit event, data
+    @io.emit event, data
+
+  getIP: (socket) =>
+    socket.client.conn.remoteAddress
 
   handleConnection: (socket) =>
     rogue = @addRogue socket
@@ -27,7 +30,7 @@ class MultiRogueServer
     socket.on 'disconnect', @removeRogue(rogue)
 
   addRogue: (socket) =>
-    console.log "[#{socket.handshake.address.address}] Rogue joined."
+    console.log "[#{@getIP socket}] Rogue joined."
     newRogue = { socket, type: 'ROGUE', canMove: true, hp: 20 }
     @occupy newRogue
     @players.push newRogue
@@ -35,7 +38,7 @@ class MultiRogueServer
     return newRogue
 
   removeRogue: (rogue) => () =>
-    console.log "[#{rogue.socket.handshake.address.address}] Rogue left."
+    console.log "[#{@getIP rogue.socket}] Rogue left."
     for list in [@rogues, @players]
       index = list.indexOf rogue
       list.splice index, 1 if index >= 0

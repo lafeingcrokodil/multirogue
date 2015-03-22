@@ -8,8 +8,8 @@ class Screen
     @charWidth = @getTextWidth 'x'
 
     # resize canvas according to character dimensions
-    @width = canvas.width = cols * @charWidth
-    @height = canvas.height = (rows + 2) * @charHeight
+    @width = canvas.width = @cols * @charWidth
+    @height = canvas.height = (@rows + 2) * @charHeight
 
     # set font (including size and colour)
     @context.font = @getFont()
@@ -39,7 +39,7 @@ class Screen
         @display char, row, col
 
 $(document).ready ->
-  socket = io.connect "//#{location.host}"
+  socket = io()
 
   socket.on 'map', (mapData) ->
     screen = new Screen $('#screen')[0], mapData.rows, mapData.cols
