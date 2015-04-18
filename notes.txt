@@ -155,4 +155,5 @@ C++ TODO
 ---------------------------------------------------------------------
 - updated package.json
 - updated app.coffee
+- updated keyCodes and symbols files (json -> coffee)
 =====================================================================

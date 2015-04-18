@@ -1,6 +1,8 @@
 fs   = require 'fs'
 path = require 'path'
 
+symbols = require './symbols'
+
 class Map
   module.exports = Map
 
@@ -10,10 +12,6 @@ class Map
     # calculate map size
     @rows = @tiles.length
     @cols = @tiles[0].length
-
-    # load symbol dictionary
-    symbolStr = fs.readFileSync path.join('server', 'symbols.json'), 'utf8'
-    @symbols = JSON.parse symbolStr
 
   loadFromFile: (mapName) =>
     mapFile = fs.readFileSync path.join('server', 'maps', "#{mapName}.txt"), 'utf8'
@@ -65,10 +63,10 @@ class Map
   isValid: (row, col) =>
     inBounds = 0 <= row < @rows and 0 <= col < @cols
     terrainOK = @tiles[row][col].terrain in [
-      @symbols.GROUND,
-      @symbols.DOOR,
-      @symbols.PASSAGE,
-      @symbols.TRAP
+      symbols.GROUND,
+      symbols.DOOR,
+      symbols.PASSAGE,
+      symbols.TRAP
     ]
     return inBounds and terrainOK
 
@@ -97,4 +95,4 @@ class Map
   Returns the symbol that is visible on the specified map tile.
   ###
   getSymbol: (tile) =>
-    if tile.occupant then @symbols[tile.occupant.type] else tile.terrain
+    if tile.occupant then symbols[tile.occupant.type] else tile.terrain
