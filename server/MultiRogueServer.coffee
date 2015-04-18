@@ -1,3 +1,5 @@
+_ = require 'lodash'
+
 Map             = require './Map'
 KeyEventHandler = require './KeyEventHandler'
 
@@ -40,8 +42,7 @@ class MultiRogueServer
   removeRogue: (rogue) => () =>
     console.log "[#{@getIP rogue.socket}] Rogue left."
     for list in [@rogues, @players]
-      index = list.indexOf rogue
-      list.splice index, 1 if index >= 0
+      _.remove list, rogue
     @unoccupy rogue.row, rogue.col
     if @rogues.every((rogue) -> not rogue.canMove)
       do @handleNewTurn
@@ -52,8 +53,7 @@ class MultiRogueServer
       list = @rogues
     else
       list = @monsters
-    index = list.indexOf creature
-    list.splice index, 1
+    _.remove list, creature
     @unoccupy creature.row, creature.col
 
   spawnMonster: (type) =>
