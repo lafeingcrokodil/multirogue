@@ -62,7 +62,7 @@ class MultiRogueServer
         console.log "#{creature.type} defeated #{occupant.type}!"
         @handleDefeat occupant
       if victory or not occupant
-        @unoccupy occupant, oldPos.row, oldPos.col if occupant
+        @unoccupy creature, oldPos.row, oldPos.col
         @occupy creature, newPos.row, newPos.col
 
   isAlly: (creature, other) =>
