@@ -1,7 +1,7 @@
 _ = require 'lodash'
 
 Map             = require './Map'
-KeyEventHandler = require './KeyEventHandler'
+keyEventHandler = require './handlers/keys'
 
 class MultiRogueServer
   module.exports = MultiRogueServer
@@ -15,7 +15,7 @@ class MultiRogueServer
 
   constructor: (@io) ->
     @map = new Map
-    @keyEventHandler = new KeyEventHandler @
+    @handleKeyEvent = keyEventHandler @
     @io.sockets.on 'connection', @handleConnection
 
   broadcast: (event, data) =>
@@ -28,7 +28,7 @@ class MultiRogueServer
     rogue = @addRogue socket
     socket.emit 'map', { map: @map.getSnapshot(), rows: @map.rows, cols: @map.cols }
     socket.emit 'stats', { hp: rogue.hp }
-    socket.on 'key', @keyEventHandler.handle(rogue)
+    socket.on 'key', @handleKeyEvent(rogue)
     socket.on 'disconnect', @removeRogue(rogue)
 
   addRogue: (socket) =>
