@@ -162,4 +162,6 @@ C++ TODO
 20.06.2015
 ---------------------------------------------------------------------
 - refactored key event handler
+- added dice and level modules
+- reset version numbering (no real sense in it yet)
 =====================================================================
