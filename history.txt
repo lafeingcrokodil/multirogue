@@ -164,7 +164,7 @@ C++ TODO
 - refactored key event handler
 - added dice and level modules
 - reset version numbering (no real sense in it yet)
-- did some major refactoring
+- did some major refactoring (moving towards event-based approach)
 - no monsters are spawned for the time being
 - no limitation on rogue movement
 - all stats displayed (not just hit points)
