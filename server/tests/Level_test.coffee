@@ -1,6 +1,6 @@
 should = require 'should'
 
-Level = require '../Level'
+Level = require '../creatures/Level'
 
 describe 'Level', ->
 

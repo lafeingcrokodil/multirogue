@@ -3,6 +3,7 @@ module.exports =
   GROUND: '.'
   DOOR: '+'
   PASSAGE: '#'
+  STAIRCASE: '%'
   TRAP: '^'
   H_WALL: '-'
   V_WALL: '|'
@@ -45,3 +46,4 @@ module.exports =
   SCROLL: '?'
   WAND: '/'
   WEAPON: ')'
+  GOLD: '*'

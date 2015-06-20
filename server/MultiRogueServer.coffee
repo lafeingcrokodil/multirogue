@@ -1,7 +1,10 @@
 _ = require 'lodash'
 
-Map             = require './Map'
-keyEventHandler = require './handlers/keys'
+Dungeon = require './dungeon/Dungeon'
+Rogue   = require './creatures/Rogue'
+
+monsters =
+  Emu: require './creatures/monsters/Emu'
 
 class MultiRogueServer
   module.exports = MultiRogueServer
@@ -10,112 +13,72 @@ class MultiRogueServer
   rogues   : [] # living players
   monsters : [] # living monsters
 
-  movedCount: 0
-  turnCount: 0
-
   constructor: (@io) ->
-    @map = new Map
-    @handleKeyEvent = keyEventHandler @
+    @dungeon = new Dungeon
     @io.sockets.on 'connection', @handleConnection
 
-  broadcast: (event, data) =>
-    @io.emit event, data
-
-  getIP: (socket) =>
-    socket.client.conn.remoteAddress
-
   handleConnection: (socket) =>
-    rogue = @addRogue socket
-    socket.emit 'map', { map: @map.getSnapshot(), rows: @map.rows, cols: @map.cols }
-    socket.emit 'stats', { hp: rogue.hp }
-    socket.on 'key', @handleKeyEvent(rogue)
-    socket.on 'disconnect', @removeRogue(rogue)
-
-  addRogue: (socket) =>
     console.log "[#{@getIP socket}] Rogue joined."
-    newRogue = { socket, type: 'ROGUE', canMove: true, hp: 20 }
-    @occupy newRogue
-    @players.push newRogue
-    @rogues.push newRogue
-    return newRogue
+    rogue = new Rogue socket, @dungeon.levels[0]
+    @occupy rogue
+    @players.push rogue
+    @rogues.push rogue
 
-  removeRogue: (rogue) => () =>
+    socket.emit 'map', rogue.dungeonLevel.getMap()
+    socket.emit 'stats', rogue.getStats()
+
+    rogue.on 'move', ({ dRow, dCol }) => @move rogue, dRow, dCol
+    rogue.on 'hit', ({ monster }) => console.log "Rogue hit #{monster.type.toLowerCase()}!"
+    rogue.on 'miss', ({ monster }) => console.log "Rogue missed #{monster.type.toLowerCase()}!"
+    rogue.on 'defeat', @handleDefeat
+    rogue.on 'deceased', => @handleDefeat(rogue)
+    rogue.on 'disconnect', @removePlayer(rogue)
+
+  removePlayer: (rogue) => =>
     console.log "[#{@getIP rogue.socket}] Rogue left."
     for list in [@rogues, @players]
       _.remove list, rogue
-    @unoccupy rogue.row, rogue.col
-    if @rogues.every((rogue) -> not rogue.canMove)
-      do @handleNewTurn
+    @unoccupy rogue, rogue.row, rogue.col
 
   handleDefeat: (creature) =>
-    if creature.type is 'ROGUE'
-      creature.canMove = false
-      list = @rogues
-    else
-      list = @monsters
+    list = if creature.type is 'ROGUE' then @rogues else @monsters
     _.remove list, creature
-    @unoccupy creature.row, creature.col
+    @unoccupy creature, creature.row, creature.col
 
-  spawnMonster: (type) =>
-    newMonster = { type, canMove: true, hp: 5 }
-    @occupy newMonster
-    @monsters.push newMonster
+  spawnMonster: =>
+    monster = new monsters.Emu # TODO: pick random monster based on dungeon level
+    @occupy monster
+    @monsters.push monster
 
   move: (creature, dRow, dCol) =>
-    return unless creature.canMove
     if dRow or dCol
       oldPos = { row: creature.row, col: creature.col }
       newPos = { row: oldPos.row + dRow, col: oldPos.col + dCol }
-      return unless @map.isValid newPos.row, newPos.col
-      occupant = @map.getOccupant newPos.row, newPos.col
+      return unless creature.dungeonLevel.isValid newPos.row, newPos.col
+      occupant = creature.dungeonLevel.getOccupant newPos.row, newPos.col
       return if occupant and @isAlly creature, occupant
-      victory = @attack creature, occupant if occupant
+      victory = creature.attack occupant if occupant
       if victory
-        console.log "#{occupant.type} defeated by #{creature.type}"
+        console.log "#{creature.type} defeated #{occupant.type}!"
         @handleDefeat occupant
       if victory or not occupant
-        @unoccupy oldPos.row, oldPos.col
+        @unoccupy creature, oldPos.row, oldPos.col
         @occupy creature, newPos.row, newPos.col
-    if creature.type is 'ROGUE'
-      creature.canMove = false
-      if (++@movedCount) is @rogues.length
-        do @handleNewTurn
-
-  moveMonsters: =>
-    for monster, i in @monsters
-      if @rogues.length > 0
-        target = @rogues[i % @rogues.length]
-        dRow = @compare target.row, monster.row
-        dCol = @compare target.col, monster.col
-        @move monster, dRow, dCol
-
-  attack: (assailant, victim) =>
-    victim.hp--
-    if victim.type is 'ROGUE'
-      victim.socket.emit 'stats', { hp: victim.hp }
-    return victim.hp <= 0
 
   isAlly: (creature, other) =>
     bothRogues = creature.type is 'ROGUE' and other.type is 'ROGUE'
     bothMonsters = creature.type isnt 'ROGUE' and other.type isnt 'ROGUE'
     return bothRogues or bothMonsters
 
-  compare: (a, b) =>
-    if a < b then -1 else if a > b then 1 else 0
-
   occupy: (occupant, row, col) =>
-    { char, row, col } = @map.occupy occupant, row, col
+    { char, row, col } = occupant.dungeonLevel.occupy occupant, row, col
     @broadcast 'display', { char, row, col }
 
-  unoccupy: (row, col) =>
-    { char } = @map.unoccupy row, col
+  unoccupy: (occupant, row, col) =>
+    { char } = occupant.dungeonLevel.unoccupy row, col
     @broadcast 'display', { char, row, col }
 
-  handleNewTurn: =>
-    @turnCount++
-    if @turnCount % 10 is 0
-      @spawnMonster 'EMU'
-    do @moveMonsters
-    @movedCount = 0
-    for rogue in @rogues
-      rogue.canMove = true
+  broadcast: (event, data) =>
+    @io.emit event, data
+
+  getIP: (socket) -> socket.client.conn.remoteAddress

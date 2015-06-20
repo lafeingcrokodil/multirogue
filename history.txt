@@ -1,5 +1,5 @@
 =====================================================================
-PROJECT NOTES
+PROJECT HISTORY
 =====================================================================
 
 =====================================================================
@@ -164,4 +164,10 @@ C++ TODO
 - refactored key event handler
 - added dice and level modules
 - reset version numbering (no real sense in it yet)
+- did some major refactoring
+- no monsters are spawned for the time being
+- no limitation on rogue movement
+- all stats displayed (not just hit points)
+- added two example levels with multiple rooms
+- added rogue and monster classes
 =====================================================================

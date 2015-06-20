@@ -29,26 +29,41 @@ class Screen
     @context.clearRect @getX(col), @getY(row-1) + 1, @getTextWidth(text), @charHeight
     @context.fillText text, @getX(col), @getY(row)
 
-  displayStats: (text) =>
+  displayStats: (stats) =>
+    hp = "#{stats.hitPoints}(#{stats.maxHitPoints})"
+    str = "#{stats.strength}(#{stats.maxStrength})"
+    exp = "#{stats.level}/#{stats.experience}"
+    statStr = ''
+    statStr += "Lvl: #{@pad(stats.dungeonLevel, 4)}"
+    statStr += "Gold: #{@pad(stats.gold.toString(), 8)}"
+    statStr += "HP: #{@pad(hp, 10)}"
+    statStr += "Str: #{@pad(str, 8)}"
+    statStr += "Arm: #{@pad(stats.armourClass.toString(), 4)}"
+    statStr += "Exp: #{exp}"
     @context.clearRect 0, @getY(@rows-1) + 1, @width, @charHeight
-    @context.fillText text, 0, @getY(@rows)
+    @context.fillText statStr, 0, @getY(@rows)
 
   displayMap: (map) =>
     for mapRow, row in map
       for char, col in mapRow
         @display char, row, col
 
+  pad: (str, length) ->
+    if length > str.length
+      str += (' ' for i in [1..length-str.length]).join('')
+    else
+      str
+
 $(document).ready ->
   socket = io()
 
-  socket.on 'map', (mapData) ->
-    screen = new Screen $('#screen')[0], mapData.rows, mapData.cols
+  socket.on 'map', (map) ->
+    screen = new Screen $('#screen')[0], map.length, map[0].length
     $('#screen').css 'display', 'block' # make screen visible
-    screen.displayMap mapData.map
-    socket.on 'display', (data) ->
-      screen.display data.char, data.row, data.col
-    socket.on 'stats', (data) ->
-      screen.displayStats "HP: #{data.hp}"
+    screen.displayMap map
+    socket.on 'display', ({ char, row, col }) ->
+      screen.display char, row, col
+    socket.on 'stats', screen.displayStats
 
   $(document).keydown (e) ->
     socket.emit 'key', e.which

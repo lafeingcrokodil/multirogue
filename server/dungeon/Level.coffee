@@ -1,31 +1,31 @@
 fs   = require 'fs'
 path = require 'path'
 
-symbols = require './data/symbols'
+symbols = require './symbols'
 
-class Map
-  module.exports = Map
+class Level
+  module.exports = Level
 
-  constructor: ->
-    @tiles = @loadFromFile 'oneRoom'
+  constructor: (filePath) ->
+    @tiles = @loadFromFile filePath
+    @name = path.basename filePath, '.txt'
 
-    # calculate map size
+    # calculate level size
     @rows = @tiles.length
     @cols = @tiles[0].length
 
-  loadFromFile: (mapName) =>
-    mapFile = fs.readFileSync path.join('server', 'maps', "#{mapName}.txt"), 'utf8'
+  loadFromFile: (filePath) ->
+    levelFile = fs.readFileSync filePath, 'utf8'
 
     tiles = []
-    for row in mapFile.split /[\r\n]+/
-      tiles.push row.split('').map (char) => { terrain: char }
+    for row in levelFile.split /[\r\n]+/
+      tiles.push row.split('').map (char) -> { terrain: char }
 
     return tiles
 
   ###
   Places the specified occupant at the specified position.
-  If no position is provided, a valid position is chosen
-  randomly.
+  If no position is provided, a valid position is chosen randomly.
 
   OUTPUT
     char: the symbol that is now visible at the occupant's
@@ -75,15 +75,15 @@ class Map
 
   ###
   Returns a two-dimensional array containing the symbols
-  currently visible on the map. For unoccupied tiles, the
+  currently visible on the level. For unoccupied tiles, the
   visible symbol is the terrain symbol and for occupied tiles
   it is the occupant's symbol (e.g. 'E', if it's an emu).
   ###
-  getSnapshot: =>
-    snapshot = []
+  getMap: =>
+    map = []
     for row in @tiles
-      snapshot.push row.map (tile) => @getSymbol tile
-    return snapshot
+      map.push row.map (tile) => @getSymbol tile
+    return map
 
   ###
   Returns the symbol that is visible at the specified position.
@@ -92,7 +92,7 @@ class Map
     @getSymbol @tiles[row][col]
 
   ###
-  Returns the symbol that is visible on the specified map tile.
+  Returns the symbol that is visible on the specified tile.
   ###
   getSymbol: (tile) =>
     if tile.occupant then symbols[tile.occupant.type] else tile.terrain

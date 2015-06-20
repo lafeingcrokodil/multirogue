@@ -1,4 +1,6 @@
-module.exports = [
+_ = require 'lodash'
+
+levels = [
   { minExp: 0, healDice: '1', healDelay: 18 }
   { minExp: 10, healDice: '1', healDelay: 17 }
   { minExp: 20, healDice: '1', healDelay: 15 }
@@ -21,3 +23,18 @@ module.exports = [
   { minExp: 4000000, healDice: '1d13', healDelay: 3 }
   { minExp: 8000000, healDice: '1d14', healDelay: 3 }
 ]
+
+get = (levelNumber) ->
+  return levels[levelNumber - 1]
+
+update = (currLevelNumber, exp) ->
+  currLevel = get currLevelNumber
+  nextLevel = get currLevelNumber + 1 if currLevelNumber < levels.length
+
+  if exp < currLevel.minExp or (nextLevel and exp >= nextLevel.minExp) # level has changed
+    levelIndex = _.findLastIndex levels, (level) -> exp >= level.minExp
+    return levelIndex + 1
+  else
+    return currLevelNumber
+
+module.exports = { get, update }
