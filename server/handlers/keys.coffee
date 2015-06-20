@@ -1,5 +1,5 @@
 
-keyCodes = require '../keyCodes'
+keyCodes = require '../data/keyCodes'
 
 module.exports = (server) -> (rogue) -> (code) ->
   switch keyCodes[code]

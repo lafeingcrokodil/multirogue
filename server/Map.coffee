@@ -1,7 +1,7 @@
 fs   = require 'fs'
 path = require 'path'
 
-symbols = require './symbols'
+symbols = require './data/symbols'
 
 class Map
   module.exports = Map
