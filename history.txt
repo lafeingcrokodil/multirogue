@@ -186,15 +186,14 @@ C++ TODO
 - other rogues are greyed out
 - fixed tile-skipping bug
 - stop listening for 'players' event after entering dungeon
-- refactored front-end code
-- moved (melee) attack method to server class
+- refactored code (front end and back end)
 - started paving the way for hit/miss/etc. notifications
+- emus now retaliate when attacked
 =====================================================================
 
 =====================================================================
 UPCOMING
 ---------------------------------------------------------------------
-- emus retaliate when attacked
 - rogues regenerate health
 - maximum hit points increase when rogues level up
 - notifications (e.g. hit/miss) are printed in browser

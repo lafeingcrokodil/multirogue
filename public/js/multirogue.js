@@ -198,7 +198,7 @@
       statStr += "Str: " + (this.pad(str, 8));
       statStr += "Arm: " + (this.pad(stats.armourClass.toString(), 4));
       statStr += "Exp: " + exp;
-      this.context.clearRect(0, this.getY(this.rows - 1) + 1, this.width, this.charHeight);
+      this.context.clearRect(0, this.getY(this.rows - 1) + 1, this.width, this.charHeight + 1);
       return this.context.fillText(statStr, 0, this.getY(this.rows));
     };
 

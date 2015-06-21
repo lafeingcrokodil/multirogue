@@ -111,7 +111,7 @@ class Screen
     statStr += "Str: #{@pad(str, 8)}"
     statStr += "Arm: #{@pad(stats.armourClass.toString(), 4)}"
     statStr += "Exp: #{exp}"
-    @context.clearRect 0, @getY(@rows-1) + 1, @width, @charHeight
+    @context.clearRect 0, @getY(@rows-1) + 1, @width, @charHeight + 1
     @context.fillText statStr, 0, @getY(@rows)
 
   displayLevel: ({ map, rogues }) =>

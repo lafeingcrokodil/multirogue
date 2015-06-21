@@ -47,18 +47,20 @@ class MultiRogueServer
       occupant = creature.dungeonLevel.getOccupant newPos.row, newPos.col
       return if occupant and creature.isAlly occupant
       victory = @meleeAttack creature, occupant if occupant
-      if victory
-        @handleDefeat creature, occupant
       if victory or not occupant
         creature.dungeonLevel.unoccupy oldPos.row, oldPos.col
         creature.dungeonLevel.occupy creature, newPos.row, newPos.col
+      else if occupant and occupant.type isnt 'ROGUE'
+        @meleeAttack occupant, creature
 
   meleeAttack: (attacker, victim) =>
     hitChance = attacker.getHitChance() - victim.getBlockChance()
     if Dice.roll('1d100') <= hitChance
       damage = attacker.getDamage()
       @report 'hit', { attacker, victim, hitPoints: victim.hitPoints, damage }
-      victim.takeDamage damage
+      victory = victim.takeDamage damage
+      @handleDefeat attacker, victim if victory
+      return victory
     else
       @report 'miss', { attacker, victim }
       return false # victim wasn't defeated
@@ -76,13 +78,13 @@ class MultiRogueServer
       when 'hit'
         { attacker, victim, hitPoints, damage } = data
         hitPointStr = "#{data.hitPoints} -> #{data.hitPoints - data.damage}"
-        debug('game') "#{getName attacker} hit #{getName victim} (#{hitPointStr})!"
+        debug('game') "#{getName attacker} hit #{getName victim} (#{hitPointStr})"
       when 'miss'
         { attacker, victim } = data
-        debug('game') "#{getName attacker} missed #{getName victim}!"
+        debug('game') "#{getName attacker} missed #{getName victim}"
       when 'defeat'
         { attacker, victim } = data
-        debug('game') "#{getName attacker} defeated #{getName victim}!"
+        debug('game') "#{getName attacker} defeated #{getName victim}"
 
   broadcast: (event, data) =>
     @io.emit event, data
