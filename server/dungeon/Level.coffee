@@ -72,7 +72,7 @@ class Level
     loop # trial and error
       row = Math.floor (@rows * Math.random())
       col = Math.floor (@cols * Math.random())
-      break if @isValid(row, col) and not @getOccupant(row, col)
+      break if @isValidSpawnPos(row, col) and not @getOccupant(row, col)
     return { row, col }
 
   isValid: (row, col) =>
@@ -85,6 +85,12 @@ class Level
       symbols.TRAP
     ]
     return inBounds and terrainOK
+
+  isValidSpawnPos: (row, col) =>
+    @isValid(row, col) and @tiles[row][col].terrain in [
+      symbols.GROUND,
+      symbols.STAIRCASE
+    ]
 
   isStaircase: (row, col) =>
     @tiles[row][col].terrain is symbols.STAIRCASE

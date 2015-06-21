@@ -177,4 +177,5 @@ C++ TODO
 ---------------------------------------------------------------------
 - rogues can now go down staircases
 - moved key event handling to front end
+- rogues only spawn in rooms (not in passages or doorways)
 =====================================================================
