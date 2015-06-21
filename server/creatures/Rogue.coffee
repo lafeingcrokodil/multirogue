@@ -24,7 +24,7 @@ class Rogue extends EventEmitter
     @socket.on 'disconnect', => @emit 'disconnect'
 
   getStats: =>
-    return _.extend @stats, { dungeonLevel: @dungeonLevel.name }
+    return @stats
     
   changeExperience: (dExp) =>
     @stats.experience += dExp

@@ -1,17 +1,19 @@
 class Screen
 
-  constructor: (canvas, @rows, @cols) ->
+  constructor: (canvas, level) ->
     @context = canvas.getContext '2d'
 
-    # get character dimensions
+    @currLevel = level.name
+
     @charHeight = 12 # character height is fixed
     @charWidth = @getTextWidth 'x'
 
-    # resize canvas according to character dimensions
+    @rows = level.map.length
+    @cols = level.map[0].length
+
     @width = canvas.width = @cols * @charWidth
     @height = canvas.height = (@rows + 2) * @charHeight
 
-    # set font (including size and colour)
     @context.font = @getFont()
     @context.fillStyle = '#FFFFFF'
 
@@ -34,7 +36,7 @@ class Screen
     str = "#{stats.strength}(#{stats.maxStrength})"
     exp = "#{stats.level}/#{stats.experience}"
     statStr = ''
-    statStr += "Lvl: #{@pad(stats.dungeonLevel, 4)}"
+    statStr += "Lvl: #{@pad(@currLevel, 4)}"
     statStr += "Gold: #{@pad(stats.gold.toString(), 8)}"
     statStr += "HP: #{@pad(hp, 10)}"
     statStr += "Str: #{@pad(str, 8)}"
@@ -57,10 +59,10 @@ class Screen
 $(document).ready ->
   socket = io()
 
-  socket.on 'map', (map) ->
-    screen = new Screen $('#screen')[0], map.length, map[0].length
+  socket.on 'level', (level) ->
+    screen = new Screen $('#screen')[0], level
     $('#screen').css 'display', 'block' # make screen visible
-    screen.displayMap map
+    screen.displayMap level.map
     socket.on 'display', ({ char, row, col }) ->
       screen.display char, row, col
     socket.on 'stats', screen.displayStats

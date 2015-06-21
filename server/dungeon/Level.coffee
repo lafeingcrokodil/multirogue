@@ -1,10 +1,17 @@
+_    = require 'lodash'
 fs   = require 'fs'
 path = require 'path'
 
 symbols = require './symbols'
 
+monsters =
+  Emu: require '../creatures/monsters/Emu'
+
 class Level
   module.exports = Level
+
+  rogues   : [] # living rogues
+  monsters : [] # living monsters
 
   constructor: (filePath) ->
     @tiles = @loadFromFile filePath
@@ -23,15 +30,28 @@ class Level
 
     return tiles
 
+  broadcast: (event, data) =>
+    for rogue in @rogues
+      rogue.socket.emit event, data
+
+  addCreature: (creature) =>
+    @occupy creature
+    list = if creature.type is 'ROGUE' then @rogues else @monsters
+    list.push creature
+
+  removeCreature: (creature) =>
+    @unoccupy creature.row, creature.col
+    list = if creature.type is 'ROGUE' then @rogues else @monsters
+    _.remove list, creature
+
+  spawnMonster: =>
+    monster = new monsters.Emu # TODO: pick random monster based on dungeon level
+    @occupy monster
+    @monsters.push monster
+
   ###
   Places the specified occupant at the specified position.
   If no position is provided, a valid position is chosen randomly.
-
-  OUTPUT
-    char: the symbol that is now visible at the occupant's
-          new position -- usually the occupant's symbol
-    row:  first coordinate of the occupant's new position
-    col:  second coordinate of the occupant's new position
   ###
   occupy: (occupant, row, col) =>
     unless row? and col?
@@ -39,19 +59,11 @@ class Level
     @tiles[row][col].occupant = occupant
     occupant.row = row
     occupant.col = col
-    return { char: @symbolAt(row, col), row, col }
+    @broadcast 'display', { char: @symbolAt(row, col), row, col }
 
-  ###
-  Removes whatever creature is currently occupying
-  the specified position.
-
-  OUTPUT
-    char: the symbol that is visible at the now unoccupied
-          position -- usually the underlying terrain symbol
-  ###
   unoccupy: (row, col) =>
     @tiles[row][col].occupant = null
-    return { char: @symbolAt(row, col) }
+    @broadcast 'display', { char: @symbolAt(row, col), row, col }
 
   getRandomSpawnPos: =>
     loop # trial and error

@@ -3,15 +3,10 @@ _ = require 'lodash'
 Dungeon = require './dungeon/Dungeon'
 Rogue   = require './creatures/Rogue'
 
-monsters =
-  Emu: require './creatures/monsters/Emu'
-
 class MultiRogueServer
   module.exports = MultiRogueServer
 
-  players  : [] # all players connected to the current game
-  rogues   : [] # living players
-  monsters : [] # living monsters
+  players: [] # all players connected to the current game
 
   constructor: (@io) ->
     @dungeon = new Dungeon
@@ -19,12 +14,15 @@ class MultiRogueServer
 
   handleConnection: (socket) =>
     console.log "[#{@getIP socket}] Rogue joined."
-    rogue = new Rogue socket, @dungeon.levels[0]
-    @occupy rogue
     @players.push rogue
-    @rogues.push rogue
 
-    socket.emit 'map', rogue.dungeonLevel.getMap()
+    level = @dungeon.levels[0]
+    rogue = new Rogue socket, level
+    level.addCreature rogue
+
+    socket.emit 'level',
+      name : rogue.dungeonLevel.name
+      map  : rogue.dungeonLevel.getMap()
     socket.emit 'stats', rogue.getStats()
 
     rogue.on 'move', ({ dRow, dCol }) => @move rogue, dRow, dCol
@@ -36,19 +34,12 @@ class MultiRogueServer
 
   removePlayer: (rogue) => =>
     console.log "[#{@getIP rogue.socket}] Rogue left."
-    for list in [@rogues, @players]
-      _.remove list, rogue
-    @unoccupy rogue, rogue.row, rogue.col
+    _.remove @players, rogue
+    rogue.dungeonLevel.removeCreature rogue
 
-  handleDefeat: (creature) =>
-    list = if creature.type is 'ROGUE' then @rogues else @monsters
-    _.remove list, creature
-    @unoccupy creature, creature.row, creature.col
-
-  spawnMonster: =>
-    monster = new monsters.Emu # TODO: pick random monster based on dungeon level
-    @occupy monster
-    @monsters.push monster
+  handleDefeat: (creature, murderer) =>
+    console.log "#{murderer.type} defeated #{creature.type}!"
+    creature.dungeonLevel.removeCreature creature
 
   move: (creature, dRow, dCol) =>
     if dRow or dCol
@@ -59,24 +50,15 @@ class MultiRogueServer
       return if occupant and @isAlly creature, occupant
       victory = creature.attack occupant if occupant
       if victory
-        console.log "#{creature.type} defeated #{occupant.type}!"
-        @handleDefeat occupant
+        @handleDefeat occupant, creature
       if victory or not occupant
-        @unoccupy creature, oldPos.row, oldPos.col
-        @occupy creature, newPos.row, newPos.col
+        creature.dungeonLevel.unoccupy oldPos.row, oldPos.col
+        creature.dungeonLevel.occupy creature, newPos.row, newPos.col
 
   isAlly: (creature, other) =>
     bothRogues = creature.type is 'ROGUE' and other.type is 'ROGUE'
     bothMonsters = creature.type isnt 'ROGUE' and other.type isnt 'ROGUE'
     return bothRogues or bothMonsters
-
-  occupy: (occupant, row, col) =>
-    { char, row, col } = occupant.dungeonLevel.occupy occupant, row, col
-    @broadcast 'display', { char, row, col }
-
-  unoccupy: (occupant, row, col) =>
-    { char } = occupant.dungeonLevel.unoccupy row, col
-    @broadcast 'display', { char, row, col }
 
   broadcast: (event, data) =>
     @io.emit event, data

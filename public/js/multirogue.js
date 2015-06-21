@@ -4,9 +4,7 @@
     bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
   Screen = (function() {
-    function Screen(canvas, rows, cols) {
-      this.rows = rows;
-      this.cols = cols;
+    function Screen(canvas, level) {
       this.displayMap = bind(this.displayMap, this);
       this.displayStats = bind(this.displayStats, this);
       this.display = bind(this.display, this);
@@ -15,8 +13,11 @@
       this.getTextWidth = bind(this.getTextWidth, this);
       this.getFont = bind(this.getFont, this);
       this.context = canvas.getContext('2d');
+      this.currLevel = level.name;
       this.charHeight = 12;
       this.charWidth = this.getTextWidth('x');
+      this.rows = level.map.length;
+      this.cols = level.map[0].length;
       this.width = canvas.width = this.cols * this.charWidth;
       this.height = canvas.height = (this.rows + 2) * this.charHeight;
       this.context.font = this.getFont();
@@ -51,7 +52,7 @@
       str = stats.strength + "(" + stats.maxStrength + ")";
       exp = stats.level + "/" + stats.experience;
       statStr = '';
-      statStr += "Lvl: " + (this.pad(stats.dungeonLevel, 4));
+      statStr += "Lvl: " + (this.pad(this.currLevel, 4));
       statStr += "Gold: " + (this.pad(stats.gold.toString(), 8));
       statStr += "HP: " + (this.pad(hp, 10));
       statStr += "Str: " + (this.pad(str, 8));
@@ -102,11 +103,11 @@
   $(document).ready(function() {
     var socket;
     socket = io();
-    socket.on('map', function(map) {
+    socket.on('level', function(level) {
       var screen;
-      screen = new Screen($('#screen')[0], map.length, map[0].length);
+      screen = new Screen($('#screen')[0], level);
       $('#screen').css('display', 'block');
-      screen.displayMap(map);
+      screen.displayMap(level.map);
       socket.on('display', function(arg) {
         var char, col, row;
         char = arg.char, row = arg.row, col = arg.col;
