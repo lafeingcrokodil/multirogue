@@ -1,8 +1,6 @@
-_            = require 'lodash'
 EventEmitter = require('events').EventEmitter
 
-Level    = require './Level'
-keyCodes = require '../keyCodes'
+Level = require './Level'
 
 class Rogue extends EventEmitter
   module.exports = Rogue
@@ -20,8 +18,6 @@ class Rogue extends EventEmitter
   inventory: []
 
   constructor: (@socket, @dungeonLevel) ->
-    @socket.on 'key', @handleKeyEvent
-    @socket.on 'disconnect', => @emit 'disconnect'
 
   getStats: =>
     return @stats
@@ -69,24 +65,3 @@ class Rogue extends EventEmitter
     @stats.hitPoints = Math.max 0, @stat.hitPoints - amount
     @socket.emit 'stats', @getStats()
     return @stats.hitPoints <= 0
-
-  handleKeyEvent: (code) =>
-    switch keyCodes[code]
-      when 'H', 'NUMPAD_4'
-        @emit 'move', { dRow: 0, dCol: -1 }  # move left
-      when 'L', 'NUMPAD_6'
-        @emit 'move', { dRow: 0, dCol: 1 }   # move right
-      when 'K', 'NUMPAD_8'
-        @emit 'move', { dRow: -1, dCol: 0 }  # move up
-      when 'J', 'NUMPAD_2'
-        @emit 'move', { dRow: 1, dCol: 0 }   # move down
-      when 'Y', 'NUMPAD_7'
-        @emit 'move', { dRow: -1, dCol: -1 } # move diagonally up and left
-      when 'U', 'NUMPAD_9'
-        @emit 'move', { dRow: -1, dCol: 1 }  # move diagonally up and right
-      when 'B', 'NUMPAD_1'
-        @emit 'move', { dRow: 1, dCol: -1 }  # move diagonally down and left
-      when 'N', 'NUMPAD_3'
-        @emit 'move', { dRow: 1, dCol: 1 }   # move diagonally down and right
-      when 'PERIOD', 'NUMPAD_5'
-        @emit 'move', { dRow: 0, dCol: 0 }   # rest (no movement)

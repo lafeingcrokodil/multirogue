@@ -67,6 +67,28 @@ $(document).ready ->
       screen.display char, row, col
     socket.on 'stats', screen.displayStats
 
-  $(document).keydown (e) ->
-    socket.emit 'key', e.which
+  $(document).keypress (e) ->
     e.preventDefault()
+    # TODO: check browser compatibility
+    key = String.fromCharCode(e.charCode)
+    switch key
+      when 'h', '4'
+        socket.emit 'move', { dRow: 0, dCol: -1 }  # move left
+      when 'l', '6'
+        socket.emit 'move', { dRow: 0, dCol: 1 }   # move right
+      when 'k', '8'
+        socket.emit 'move', { dRow: -1, dCol: 0 }  # move up
+      when 'j', '2'
+        socket.emit 'move', { dRow: 1, dCol: 0 }   # move down
+      when 'y', '7'
+        socket.emit 'move', { dRow: -1, dCol: -1 } # move diagonally up and left
+      when 'u', '9'
+        socket.emit 'move', { dRow: -1, dCol: 1 }  # move diagonally up and right
+      when 'b', '1'
+        socket.emit 'move', { dRow: 1, dCol: -1 }  # move diagonally down and left
+      when 'n', '3'
+        socket.emit 'move', { dRow: 1, dCol: 1 }   # move diagonally down and right
+      when '.', '5'
+        socket.emit 'move', { dRow: 0, dCol: 0 }   # rest (no movement)
+      when '>'
+        socket.emit 'staircase', { direction: 'down' } # go down staircase

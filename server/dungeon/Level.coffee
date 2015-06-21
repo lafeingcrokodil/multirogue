@@ -10,9 +10,6 @@ monsters =
 class Level
   module.exports = Level
 
-  rogues   : [] # living rogues
-  monsters : [] # living monsters
-
   constructor: (filePath) ->
     @tiles = @loadFromFile filePath
     @name = path.basename filePath, '.txt'
@@ -20,6 +17,9 @@ class Level
     # calculate level size
     @rows = @tiles.length
     @cols = @tiles[0].length
+
+    @rogues   = [] # living rogues
+    @monsters = [] # living monsters
 
   loadFromFile: (filePath) ->
     levelFile = fs.readFileSync filePath, 'utf8'
@@ -38,6 +38,9 @@ class Level
     @occupy creature
     list = if creature.type is 'ROGUE' then @rogues else @monsters
     list.push creature
+    if creature.type is 'ROGUE'
+      creature.socket.emit 'level', { name: @name, map: @getMap() }
+      creature.socket.emit 'stats', creature.getStats()
 
   removeCreature: (creature) =>
     @unoccupy creature.row, creature.col
@@ -78,9 +81,13 @@ class Level
       symbols.GROUND,
       symbols.DOOR,
       symbols.PASSAGE,
+      symbols.STAIRCASE,
       symbols.TRAP
     ]
     return inBounds and terrainOK
+
+  isStaircase: (row, col) =>
+    @tiles[row][col].terrain is symbols.STAIRCASE
 
   getOccupant: (row, col) =>
     return @tiles[row][col].occupant

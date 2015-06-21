@@ -20,17 +20,14 @@ class MultiRogueServer
     rogue = new Rogue socket, level
     level.addCreature rogue
 
-    socket.emit 'level',
-      name : rogue.dungeonLevel.name
-      map  : rogue.dungeonLevel.getMap()
-    socket.emit 'stats', rogue.getStats()
+    socket.on 'move', ({ dRow, dCol }) => @move rogue, dRow, dCol
+    socket.on 'staircase', ({ direction }) => @useStaircase rogue, direction
+    socket.on 'disconnect', @removePlayer(rogue)
 
-    rogue.on 'move', ({ dRow, dCol }) => @move rogue, dRow, dCol
     rogue.on 'hit', ({ monster }) => console.log "Rogue hit #{monster.type.toLowerCase()}!"
     rogue.on 'miss', ({ monster }) => console.log "Rogue missed #{monster.type.toLowerCase()}!"
     rogue.on 'defeat', @handleDefeat
     rogue.on 'deceased', => @handleDefeat(rogue)
-    rogue.on 'disconnect', @removePlayer(rogue)
 
   removePlayer: (rogue) => =>
     console.log "[#{@getIP rogue.socket}] Rogue left."
@@ -59,6 +56,13 @@ class MultiRogueServer
     bothRogues = creature.type is 'ROGUE' and other.type is 'ROGUE'
     bothMonsters = creature.type isnt 'ROGUE' and other.type isnt 'ROGUE'
     return bothRogues or bothMonsters
+
+  useStaircase: (rogue, direction) =>
+    if rogue.dungeonLevel.isStaircase rogue.row, rogue.col
+      rogue.dungeonLevel.removeCreature rogue
+      level = @dungeon.getAdjacentLevel rogue.dungeonLevel, direction
+      rogue.dungeonLevel = level
+      level.addCreature rogue
 
   broadcast: (event, data) =>
     @io.emit event, data

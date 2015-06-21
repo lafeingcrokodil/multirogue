@@ -115,9 +115,70 @@
       });
       return socket.on('stats', screen.displayStats);
     });
-    return $(document).keydown(function(e) {
-      socket.emit('key', e.which);
-      return e.preventDefault();
+    return $(document).keypress(function(e) {
+      var key;
+      e.preventDefault();
+      key = String.fromCharCode(e.charCode);
+      switch (key) {
+        case 'h':
+        case '4':
+          return socket.emit('move', {
+            dRow: 0,
+            dCol: -1
+          });
+        case 'l':
+        case '6':
+          return socket.emit('move', {
+            dRow: 0,
+            dCol: 1
+          });
+        case 'k':
+        case '8':
+          return socket.emit('move', {
+            dRow: -1,
+            dCol: 0
+          });
+        case 'j':
+        case '2':
+          return socket.emit('move', {
+            dRow: 1,
+            dCol: 0
+          });
+        case 'y':
+        case '7':
+          return socket.emit('move', {
+            dRow: -1,
+            dCol: -1
+          });
+        case 'u':
+        case '9':
+          return socket.emit('move', {
+            dRow: -1,
+            dCol: 1
+          });
+        case 'b':
+        case '1':
+          return socket.emit('move', {
+            dRow: 1,
+            dCol: -1
+          });
+        case 'n':
+        case '3':
+          return socket.emit('move', {
+            dRow: 1,
+            dCol: 1
+          });
+        case '.':
+        case '5':
+          return socket.emit('move', {
+            dRow: 0,
+            dCol: 0
+          });
+        case '>':
+          return socket.emit('staircase', {
+            direction: 'down'
+          });
+      }
     });
   });
 
