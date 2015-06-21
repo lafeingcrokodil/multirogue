@@ -184,12 +184,9 @@ C++ TODO
 - started adding item classes
 - players pick names before joining
 - other rogues are greyed out
-=====================================================================
-
-=====================================================================
-BUGS
----------------------------------------------------------------------
-- can't submit name after server restart
+- fixed tile-skipping bug
+- stop listening for 'players' event after entering dungeon
+- refactored front-end code
 =====================================================================
 
 =====================================================================

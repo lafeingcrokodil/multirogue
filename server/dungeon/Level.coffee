@@ -67,12 +67,12 @@ class Level
     @tiles[row][col].occupant = occupant
     occupant.row = row
     occupant.col = col
-    displayData = { char: @symbolAt(row, col), row, col, name: occupant.name }
+    displayData = { text: @symbolAt(row, col), row, col, name: occupant.name }
     @broadcast 'display', displayData
 
   unoccupy: (row, col) =>
     @tiles[row][col].occupant = null
-    @broadcast 'display', { char: @symbolAt(row, col), row, col }
+    @broadcast 'display', { text: @symbolAt(row, col), row, col }
 
   getRandomSpawnPos: =>
     loop # trial and error
