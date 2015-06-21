@@ -1,67 +1,101 @@
 EventEmitter = require('events').EventEmitter
 
+Dice  = require '../Dice'
 Level = require './Level'
+
+Food     = require '../items/Food'
+RingMail = require '../items/armour/RingMail'
+Mace     = require '../items/weapons/Mace'
+ShortBow = require '../items/weapons/ShortBow'
+Quiver   = require '../items/weapons/Quiver'
 
 class Rogue extends EventEmitter
   module.exports = Rogue
 
   type: 'ROGUE'
-  stats:
-    level: 1
-    experience: 0
-    maxHitPoints: 20
-    hitPoints: 20
-    maxStrength: 1
-    strength: 1
-    armourClass: 1
-    gold: 0
-  inventory: []
+  level: 1
+  experience: 0
+  maxHitPoints: 20
+  hitPoints: 20
+  maxStrength: 16
+  strength: 16
+  gold: 0
 
-  constructor: (@socket, @dungeonLevel) ->
+  constructor: (@socket) ->
+    @inventory =
+      a: new Food
+      b: new RingMail 1
+      c: new Mace 1, 1
+      d: new ShortBow 1, 0
+      e: new Quiver
+    @rings = {}
+    @wear @inventory['b']
+    @wield @inventory['c']
+
+  wear: (armour) =>
+    if armour.type is 'ARMOUR'
+      @armour = armour
+
+  wield: (weapon) =>
+    if weapon.type is 'WEAPON'
+      @weapon = weapon
 
   getStats: =>
-    return @stats
+    level        : @level
+    experience   : Math.floor @experience
+    maxHitPoints : @maxHitPoints
+    hitPoints    : @hitPoints
+    maxStrength  : @maxStrength
+    strength     : @strength
+    armourClass  : @getArmourClass()
+    gold         : @gold
+
+  getArmourClass: =>
+    @armour?.getArmourClass() or 0
     
   changeExperience: (dExp) =>
-    @stats.experience += dExp
-    @stats.level = Level.update @stats.level, @stats.experience
+    @experience += dExp
+    @level = Level.update @level, @experience
     @socket.emit 'stats', @getStats()
 
   attack: (monster) =>
-    if Dice.roll '1d100' <= @getHitChance monster
+    if Dice.roll('1d100') <= @getHitChance monster
       damage = @getDamage()
-      @emit 'hit', { monster, damage }
-      monster.dealDamage damage
+      @emit 'hit', { monster, hitPoints: monster.hitPoints, damage }
+      monster.takeDamage damage
     else
       @emit 'miss', { monster }
       return false # monster wasn't defeated
 
   getHitChance: (monster) =>
-    levelBonus = @stats.level
+    levelBonus = @level
     armourBonus = 10 - monster.armourClass
     strengthBonus = switch
-      when @stats.strength < 8 then @stats.strength - 7
-      when @stats.strength <= 16 then 0
-      when @stats.strength <= 20 then 1
-      when @stats.strength <= 30 then 2
-      when @stats.strength >= 31 then 3
-    weaponBonus = @weapon.accuracyBonus
+      when @strength < 8 then @strength - 7
+      when @strength <= 16 then 0
+      when @strength <= 20 then 1
+      when @strength <= 30 then 2
+      when @strength >= 31 then 3
+    weaponBonus = @weapon?.accuracyBonus or 0
     # TODO: add +4 bonus if the monster is asleep or captive
     hitChance = 5 * (1 + levelBonus + armourBonus + strengthBonus + weaponBonus)
 
   getDamage: =>
+    baseDamageDice = @weapon?.damageDice.held or '1d4'
     strengthBonus = switch
-      when @stats.strength < 8 then @stats.strength - 7
-      when @stats.strength < 16 then 0
-      when @stats.strength < 18 then 1
-      when @stats.strength < 19 then 2
-      when @stats.strength < 21 then 3
-      when @stats.strength < 22 then 4
-      when @stats.strength < 31 then 5
-      when @stats.strength >= 31 then 6
-    return Dice.roll(@weapon.damageDice) + @weapon.damageBonus + strengthBonus
+      when @strength < 8 then @strength - 7
+      when @strength < 16 then 0
+      when @strength < 18 then 1
+      when @strength < 19 then 2
+      when @strength < 21 then 3
+      when @strength < 22 then 4
+      when @strength < 31 then 5
+      when @strength >= 31 then 6
+    weaponBonus = @weapon?.damageBonus or 0
+    damage = Dice.roll(baseDamageDice) + weaponBonus + strengthBonus
+    return Math.max damage, 0
 
-  dealDamage: (amount) =>
-    @stats.hitPoints = Math.max 0, @stat.hitPoints - amount
+  takeDamage: (amount) =>
+    @hitPoints = Math.max 0, @hitPoints - amount
     @socket.emit 'stats', @getStats()
-    return @stats.hitPoints <= 0
+    return @hitPoints <= 0

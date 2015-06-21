@@ -178,5 +178,22 @@ C++ TODO
 - rogues can now go down staircases
 - moved key event handling to front end
 - rogues only spawn in rooms (not in passages or doorways)
+- upgraded to Cedar-14 on Heroku
 - updated packages
+- every level has some stationary emus that can be attacked
+- started adding item classes
+=====================================================================
+
+=====================================================================
+UPCOMING
+---------------------------------------------------------------------
+- players pick names before joining
+- other players' rogues are greyed out
+- emus retaliate when attacked
+- rogues regenerate health
+- notifications (e.g. hit/miss) are printed in browser
+- attacking an emu makes it clumsily chase you
+- levels are randomly generated
+- levels are initially unexplored
+- switched from console.log to debug
 =====================================================================

@@ -1,4 +1,5 @@
-_ = require 'lodash'
+_     = require 'lodash'
+debug = require 'debug'
 
 Dungeon = require './dungeon/Dungeon'
 Rogue   = require './creatures/Rogue'
@@ -13,29 +14,33 @@ class MultiRogueServer
     @io.sockets.on 'connection', @handleConnection
 
   handleConnection: (socket) =>
-    console.log "[#{@getIP socket}] Rogue joined."
+    debug('server') "[#{@getIP socket}] Rogue joined."
     @players.push rogue
 
-    level = @dungeon.levels[0]
-    rogue = new Rogue socket, level
-    level.addCreature rogue
+    rogue = new Rogue socket
+    @dungeon.levels[0].addCreature rogue
 
     socket.on 'move', ({ dRow, dCol }) => @move rogue, dRow, dCol
     socket.on 'staircase', ({ direction }) => @useStaircase rogue, direction
     socket.on 'disconnect', @removePlayer(rogue)
+    socket.on 'error', (err) -> debug('error') err.stack
 
-    rogue.on 'hit', ({ monster }) => console.log "Rogue hit #{monster.type.toLowerCase()}!"
-    rogue.on 'miss', ({ monster }) => console.log "Rogue missed #{monster.type.toLowerCase()}!"
+    rogue.on 'hit', ({ monster, hitPoints, damage }) =>
+      debug('game') "Rogue hit #{monster.type.toLowerCase()} (#{hitPoints} -> #{hitPoints - damage})!"
+    rogue.on 'miss', ({ monster }) =>
+      debug('game') "Rogue missed #{monster.type.toLowerCase()}!"
     rogue.on 'defeat', @handleDefeat
     rogue.on 'deceased', => @handleDefeat(rogue)
 
   removePlayer: (rogue) => =>
-    console.log "[#{@getIP rogue.socket}] Rogue left."
+    debug('server') "[#{@getIP rogue.socket}] Rogue left."
     _.remove @players, rogue
     rogue.dungeonLevel.removeCreature rogue
 
   handleDefeat: (creature, murderer) =>
-    console.log "#{murderer.type} defeated #{creature.type}!"
+    debug('game') "#{murderer.type} defeated #{creature.type}!"
+    if murderer.type is 'ROGUE'
+      murderer.changeExperience creature.getExperience()
     creature.dungeonLevel.removeCreature creature
 
   move: (creature, dRow, dCol) =>
@@ -61,7 +66,6 @@ class MultiRogueServer
     if rogue.dungeonLevel.isStaircase rogue.row, rogue.col
       rogue.dungeonLevel.removeCreature rogue
       level = @dungeon.getAdjacentLevel rogue.dungeonLevel, direction
-      rogue.dungeonLevel = level
       level.addCreature rogue
 
   broadcast: (event, data) =>

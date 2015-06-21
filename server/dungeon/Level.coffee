@@ -21,6 +21,9 @@ class Level
     @rogues   = [] # living rogues
     @monsters = [] # living monsters
 
+    for i in [1..4]
+      @spawnMonster()
+
   loadFromFile: (filePath) ->
     levelFile = fs.readFileSync filePath, 'utf8'
 
@@ -35,6 +38,7 @@ class Level
       rogue.socket.emit event, data
 
   addCreature: (creature) =>
+    creature.dungeonLevel = @
     @occupy creature
     list = if creature.type is 'ROGUE' then @rogues else @monsters
     list.push creature
@@ -48,9 +52,7 @@ class Level
     _.remove list, creature
 
   spawnMonster: =>
-    monster = new monsters.Emu # TODO: pick random monster based on dungeon level
-    @occupy monster
-    @monsters.push monster
+    @addCreature new monsters.Emu # TODO: pick random monster based on dungeon level
 
   ###
   Places the specified occupant at the specified position.
