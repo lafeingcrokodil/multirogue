@@ -1,6 +1,7 @@
 _     = require 'lodash'
 debug = require 'debug'
 
+Dice    = require './Dice'
 Dungeon = require './dungeon/Dungeon'
 Rogue   = require './creatures/Rogue'
 
@@ -27,23 +28,16 @@ class MultiRogueServer
     socket.on 'disconnect', @removePlayer(rogue)
     socket.on 'error', (err) -> debug('error') err.stack
 
-    rogue.on 'hit', ({ monster, hitPoints, damage }) =>
-      debug('game') "#{rogue.name} hit #{monster.type.toLowerCase()} (#{hitPoints} -> #{hitPoints - damage})!"
-    rogue.on 'miss', ({ monster }) =>
-      debug('game') "#{rogue.name} missed #{monster.type.toLowerCase()}!"
-    rogue.on 'defeat', @handleDefeat
-    rogue.on 'deceased', => @handleDefeat(rogue)
-
   removePlayer: (rogue) => =>
     debug('server') "[#{@getIP rogue.socket}] #{rogue.name} left."
     _.remove @players, rogue
     rogue.dungeonLevel.removeCreature rogue
 
-  handleDefeat: (creature, murderer) =>
-    debug('game') "#{murderer.name or murderer.type} defeated #{creature.name or creature.type}!"
-    if murderer.type is 'ROGUE'
-      murderer.changeExperience creature.getExperience()
-    creature.dungeonLevel.removeCreature creature
+  handleDefeat: (attacker, victim) =>
+    @report 'defeat', { attacker, victim }
+    if attacker.type is 'ROGUE'
+      attacker.changeExperience victim.getExperience()
+    victim.dungeonLevel.removeCreature victim
 
   move: (creature, dRow, dCol) =>
     if dRow or dCol
@@ -51,24 +45,44 @@ class MultiRogueServer
       newPos = { row: oldPos.row + dRow, col: oldPos.col + dCol }
       return unless creature.dungeonLevel.isValid newPos.row, newPos.col
       occupant = creature.dungeonLevel.getOccupant newPos.row, newPos.col
-      return if occupant and @isAlly creature, occupant
-      victory = creature.attack occupant if occupant
+      return if occupant and creature.isAlly occupant
+      victory = @meleeAttack creature, occupant if occupant
       if victory
-        @handleDefeat occupant, creature
+        @handleDefeat creature, occupant
       if victory or not occupant
         creature.dungeonLevel.unoccupy oldPos.row, oldPos.col
         creature.dungeonLevel.occupy creature, newPos.row, newPos.col
 
-  isAlly: (creature, other) =>
-    bothRogues = creature.type is 'ROGUE' and other.type is 'ROGUE'
-    bothMonsters = creature.type isnt 'ROGUE' and other.type isnt 'ROGUE'
-    return bothRogues or bothMonsters
+  meleeAttack: (attacker, victim) =>
+    hitChance = attacker.getHitChance() - victim.getBlockChance()
+    if Dice.roll('1d100') <= hitChance
+      damage = attacker.getDamage()
+      @report 'hit', { attacker, victim, hitPoints: victim.hitPoints, damage }
+      victim.takeDamage damage
+    else
+      @report 'miss', { attacker, victim }
+      return false # victim wasn't defeated
 
   useStaircase: (rogue, direction) =>
     if rogue.dungeonLevel.isStaircase rogue.row, rogue.col
       rogue.dungeonLevel.removeCreature rogue
       level = @dungeon.getAdjacentLevel rogue.dungeonLevel, direction
       level.addCreature rogue
+
+  report: (event, data) =>
+    getName = (creature) ->
+      creature.name or creature.type.toLowerCase()
+    switch event
+      when 'hit'
+        { attacker, victim, hitPoints, damage } = data
+        hitPointStr = "#{data.hitPoints} -> #{data.hitPoints - data.damage}"
+        debug('game') "#{getName attacker} hit #{getName victim} (#{hitPointStr})!"
+      when 'miss'
+        { attacker, victim } = data
+        debug('game') "#{getName attacker} missed #{getName victim}!"
+      when 'defeat'
+        { attacker, victim } = data
+        debug('game') "#{getName attacker} defeated #{getName victim}!"
 
   broadcast: (event, data) =>
     @io.emit event, data

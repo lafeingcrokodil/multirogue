@@ -187,6 +187,8 @@ C++ TODO
 - fixed tile-skipping bug
 - stop listening for 'players' event after entering dungeon
 - refactored front-end code
+- moved (melee) attack method to server class
+- started paving the way for hit/miss/etc. notifications
 =====================================================================
 
 =====================================================================

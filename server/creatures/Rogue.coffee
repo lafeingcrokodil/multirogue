@@ -32,13 +32,8 @@ class Rogue extends EventEmitter
     @wear @inventory['b']
     @wield @inventory['c']
 
-  wear: (armour) =>
-    if armour.type is 'ARMOUR'
-      @armour = armour
-
-  wield: (weapon) =>
-    if weapon.type is 'WEAPON'
-      @weapon = weapon
+  isAlly: (creature) =>
+    creature.type is 'ROGUE'
 
   getStats: =>
     level        : @level
@@ -50,26 +45,8 @@ class Rogue extends EventEmitter
     armourClass  : @getArmourClass()
     gold         : @gold
 
-  getArmourClass: =>
-    @armour?.getArmourClass() or 0
-    
-  changeExperience: (dExp) =>
-    @experience += dExp
-    @level = Level.update @level, @experience
-    @socket.emit 'stats', @getStats()
-
-  attack: (monster) =>
-    if Dice.roll('1d100') <= @getHitChance monster
-      damage = @getDamage()
-      @emit 'hit', { monster, hitPoints: monster.hitPoints, damage }
-      monster.takeDamage damage
-    else
-      @emit 'miss', { monster }
-      return false # monster wasn't defeated
-
-  getHitChance: (monster) =>
+  getHitChance: =>
     levelBonus = @level
-    armourBonus = 10 - monster.armourClass
     strengthBonus = switch
       when @strength < 8 then @strength - 7
       when @strength <= 16 then 0
@@ -77,8 +54,12 @@ class Rogue extends EventEmitter
       when @strength <= 30 then 2
       when @strength >= 31 then 3
     weaponBonus = @weapon?.accuracyBonus or 0
-    # TODO: add +4 bonus if the monster is asleep or captive
-    hitChance = 5 * (1 + levelBonus + armourBonus + strengthBonus + weaponBonus)
+    return 5 * (1 + levelBonus + strengthBonus + weaponBonus)
+
+  getBlockChance: =>
+    # TODO: +1 for each increment on rings of protection
+    armourBonus = @getArmourClass() - 10
+    return 5 * armourBonus
 
   getDamage: =>
     baseDamageDice = @weapon?.damageDice.held or '1d4'
@@ -95,7 +76,23 @@ class Rogue extends EventEmitter
     damage = Dice.roll(baseDamageDice) + weaponBonus + strengthBonus
     return Math.max damage, 0
 
+  getArmourClass: =>
+    @armour?.getArmourClass() or 0
+
   takeDamage: (amount) =>
     @hitPoints = Math.max 0, @hitPoints - amount
     @socket.emit 'stats', @getStats()
     return @hitPoints <= 0
+
+  changeExperience: (dExp) =>
+    @experience += dExp
+    @level = Level.update @level, @experience
+    @socket.emit 'stats', @getStats()
+
+  wear: (armour) =>
+    if armour.type is 'ARMOUR'
+      @armour = armour
+
+  wield: (weapon) =>
+    if weapon.type is 'WEAPON'
+      @weapon = weapon
