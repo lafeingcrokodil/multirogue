@@ -182,15 +182,22 @@ C++ TODO
 - updated packages
 - every level has some stationary emus that can be attacked
 - started adding item classes
+- players pick names before joining
+- other rogues are greyed out
+=====================================================================
+
+=====================================================================
+BUGS
+---------------------------------------------------------------------
+- can't submit name after server restart
 =====================================================================
 
 =====================================================================
 UPCOMING
 ---------------------------------------------------------------------
-- players pick names before joining
-- other players' rogues are greyed out
 - emus retaliate when attacked
 - rogues regenerate health
+- maximum hit points increase when rogues level up
 - notifications (e.g. hit/miss) are printed in browser
 - attacking an emu makes it clumsily chase you
 - levels are randomly generated

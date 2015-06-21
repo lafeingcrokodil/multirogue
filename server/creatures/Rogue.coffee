@@ -21,7 +21,7 @@ class Rogue extends EventEmitter
   strength: 16
   gold: 0
 
-  constructor: (@socket) ->
+  constructor: (@name, @socket) ->
     @inventory =
       a: new Food
       b: new RingMail 1

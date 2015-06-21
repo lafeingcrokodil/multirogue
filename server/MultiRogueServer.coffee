@@ -11,13 +11,15 @@ class MultiRogueServer
 
   constructor: (@io) ->
     @dungeon = new Dungeon
-    @io.sockets.on 'connection', @handleConnection
+    @io.sockets.on 'connection', (socket) =>
+      socket.emit 'players', _.pluck(@players, 'name')
+      socket.on 'join', @addPlayer(socket)
 
-  handleConnection: (socket) =>
-    debug('server') "[#{@getIP socket}] Rogue joined."
+  addPlayer: (socket) => (name) =>
+    debug('server') "[#{@getIP socket}] #{name} joined."
+
+    rogue = new Rogue name, socket
     @players.push rogue
-
-    rogue = new Rogue socket
     @dungeon.levels[0].addCreature rogue
 
     socket.on 'move', ({ dRow, dCol }) => @move rogue, dRow, dCol
@@ -26,19 +28,19 @@ class MultiRogueServer
     socket.on 'error', (err) -> debug('error') err.stack
 
     rogue.on 'hit', ({ monster, hitPoints, damage }) =>
-      debug('game') "Rogue hit #{monster.type.toLowerCase()} (#{hitPoints} -> #{hitPoints - damage})!"
+      debug('game') "#{rogue.name} hit #{monster.type.toLowerCase()} (#{hitPoints} -> #{hitPoints - damage})!"
     rogue.on 'miss', ({ monster }) =>
-      debug('game') "Rogue missed #{monster.type.toLowerCase()}!"
+      debug('game') "#{rogue.name} missed #{monster.type.toLowerCase()}!"
     rogue.on 'defeat', @handleDefeat
     rogue.on 'deceased', => @handleDefeat(rogue)
 
   removePlayer: (rogue) => =>
-    debug('server') "[#{@getIP rogue.socket}] Rogue left."
+    debug('server') "[#{@getIP rogue.socket}] #{rogue.name} left."
     _.remove @players, rogue
     rogue.dungeonLevel.removeCreature rogue
 
   handleDefeat: (creature, murderer) =>
-    debug('game') "#{murderer.type} defeated #{creature.type}!"
+    debug('game') "#{murderer.name or murderer.type} defeated #{creature.name or creature.type}!"
     if murderer.type is 'ROGUE'
       murderer.changeExperience creature.getExperience()
     creature.dungeonLevel.removeCreature creature

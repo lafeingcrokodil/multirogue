@@ -43,7 +43,10 @@ class Level
     list = if creature.type is 'ROGUE' then @rogues else @monsters
     list.push creature
     if creature.type is 'ROGUE'
-      creature.socket.emit 'level', { name: @name, map: @getMap() }
+      creature.socket.emit 'level',
+        name: @name
+        map: @getMap()
+        rogues: @rogues.map (rogue) -> _.pick rogue, 'row', 'col', 'name'
       creature.socket.emit 'stats', creature.getStats()
 
   removeCreature: (creature) =>
@@ -64,7 +67,8 @@ class Level
     @tiles[row][col].occupant = occupant
     occupant.row = row
     occupant.col = col
-    @broadcast 'display', { char: @symbolAt(row, col), row, col }
+    displayData = { char: @symbolAt(row, col), row, col, name: occupant.name }
+    @broadcast 'display', displayData
 
   unoccupy: (row, col) =>
     @tiles[row][col].occupant = null
