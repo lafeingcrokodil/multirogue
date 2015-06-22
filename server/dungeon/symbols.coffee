@@ -16,7 +16,7 @@ module.exports =
   CENTAUR: 'C'
   DRAGON: 'D'
   EMU: 'E'
-  FLY_TRAP: 'F'
+  FLYTRAP: 'F'
   GRIFFIN: 'G'
   HOBGOBLIN: 'H'
   ICE_MONSTER: 'I'

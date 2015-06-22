@@ -2,10 +2,8 @@ _    = require 'lodash'
 fs   = require 'fs'
 path = require 'path'
 
-symbols = require './symbols'
-
-monsters =
-  Emu: require '../creatures/monsters/Emu'
+symbols  = require './symbols'
+monsters = require '../creatures/monsters'
 
 class Level
   module.exports = Level
@@ -21,8 +19,8 @@ class Level
     @rogues   = [] # living rogues
     @monsters = [] # living monsters
 
-    for i in [1..4]
-      @spawnMonster()
+    for name, Monster of monsters
+      @addCreature new Monster
 
   loadFromFile: (filePath) ->
     levelFile = fs.readFileSync filePath, 'utf8'
@@ -53,9 +51,6 @@ class Level
     @unoccupy creature.row, creature.col
     list = if creature.type is 'ROGUE' then @rogues else @monsters
     _.remove list, creature
-
-  spawnMonster: =>
-    @addCreature new monsters.Emu # TODO: pick random monster based on dungeon level
 
   ###
   Places the specified occupant at the specified position.

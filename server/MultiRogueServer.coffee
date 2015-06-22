@@ -55,15 +55,17 @@ class MultiRogueServer
 
   meleeAttack: (attacker, victim) =>
     hitChance = attacker.getHitChance() - victim.getBlockChance()
-    if Dice.roll('1d100') <= hitChance
-      damage = attacker.getDamage()
-      @report 'hit', { attacker, victim, hitPoints: victim.hitPoints, damage }
-      victory = victim.takeDamage damage
-      @handleDefeat attacker, victim if victory
-      return victory
-    else
-      @report 'miss', { attacker, victim }
-      return false # victim wasn't defeated
+    for damageDice in attacker.damageDice.split '+'
+      if Dice.roll('1d100') <= hitChance
+        damage = attacker.getDamage damageDice
+        @report 'hit', { attacker, victim, hitPoints: victim.hitPoints, damage }
+        victory = victim.takeDamage damage
+        if victory
+          @handleDefeat attacker, victim
+          return true # victim was defeated
+      else
+        @report 'miss', { attacker, victim }
+    return false # victim wasn't defeated
 
   useStaircase: (rogue, direction) =>
     if rogue.dungeonLevel.isStaircase rogue.row, rogue.col
@@ -72,19 +74,17 @@ class MultiRogueServer
       level.addCreature rogue
 
   report: (event, data) =>
-    getName = (creature) ->
-      creature.name or creature.type.toLowerCase()
     switch event
       when 'hit'
         { attacker, victim, hitPoints, damage } = data
         hitPointStr = "#{data.hitPoints} -> #{data.hitPoints - data.damage}"
-        debug('game') "#{getName attacker} hit #{getName victim} (#{hitPointStr})"
+        debug('game') "#{attacker.name} hit #{victim.name} (#{hitPointStr})"
       when 'miss'
         { attacker, victim } = data
-        debug('game') "#{getName attacker} missed #{getName victim}"
+        debug('game') "#{attacker.name} missed #{victim.name}"
       when 'defeat'
         { attacker, victim } = data
-        debug('game') "#{getName attacker} defeated #{getName victim}"
+        debug('game') "#{attacker.name} defeated #{victim.name}"
 
   broadcast: (event, data) =>
     @io.emit event, data

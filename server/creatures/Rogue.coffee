@@ -20,6 +20,7 @@ class Rogue extends EventEmitter
   maxStrength: 16
   strength: 16
   gold: 0
+  damageDice: '1d4'
 
   constructor: (@name, @socket) ->
     @inventory =
@@ -61,8 +62,8 @@ class Rogue extends EventEmitter
     armourBonus = @getArmourClass() - 10
     return 5 * armourBonus
 
-  getDamage: =>
-    baseDamageDice = @weapon?.damageDice.held or '1d4'
+  getDamage: (damageDice) =>
+    baseDamageDice = @weapon?.damageDice.held or damageDice
     strengthBonus = switch
       when @strength < 8 then @strength - 7
       when @strength < 16 then 0

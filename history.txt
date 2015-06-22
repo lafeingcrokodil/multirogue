@@ -189,14 +189,15 @@ C++ TODO
 - refactored code (front end and back end)
 - started paving the way for hit/miss/etc. notifications
 - emus now retaliate when attacked
+- one of each type of monsters is spawned on each level
 =====================================================================
 
 =====================================================================
 UPCOMING
 ---------------------------------------------------------------------
+- notifications (e.g. hit/miss) are printed in browser
 - rogues regenerate health
 - maximum hit points increase when rogues level up
-- notifications (e.g. hit/miss) are printed in browser
 - attacking an emu makes it clumsily chase you
 - levels are randomly generated
 - levels are initially unexplored
