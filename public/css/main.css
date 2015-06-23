@@ -1,11 +1,11 @@
 body {
+  font-family: monospace;
+  color: white;
   background-color: black;
 }
 
 #nameForm {
   display: none;
-  font-family: monospace;
-  color: white;
 }
 
 input {
@@ -16,9 +16,25 @@ input {
   outline: none;
 }
 
-#screen {
-  margin: 0 auto;
-  padding: 0;
+#container {
   display: none;
+  text-align: center;
+}
+
+#game {
+  display: inline-block;
+}
+
+canvas {
+  float: left;
+  padding: 0 30px;
   background-color: black;
+}
+
+textarea {
+  font-family: monospace;
+  color: white;
+  background-color: black;
+  border: none;
+  overflow: hidden;
 }

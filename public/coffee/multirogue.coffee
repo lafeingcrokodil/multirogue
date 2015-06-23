@@ -1,19 +1,24 @@
 playerName = ''
 socket = io()
+screen = null
 
 $(document).ready ->
   socket.on 'players', pickName
   socket.on 'level', setupLevel
+  socket.on 'notify', displayNotification
+  socket.on 'display', (data) -> screen?.display data
+  socket.on 'stats', (stats) -> screen?.displayStats stats
 
 pickName = (existingPlayers) ->
   $('#nameForm').show().submit (event) ->
     try
-      playerName = $('#nameForm input').val()
+      playerName = $('#nameInput').val()
       newPrompt = validate playerName, existingPlayers
       if newPrompt
         $('#nameForm p').text newPrompt
+        $('#nameInput').val ''
       else
-        $('#nameForm input').blur()
+        $('#nameInput').blur()
         $('#nameForm').hide()
         socket.emit 'join', playerName
         addKeyListener()
@@ -55,12 +60,14 @@ addKeyListener = ->
       else return # don't prevent default for unrecognized keys
     e.preventDefault()
 
+displayNotification = (notification) ->
+  $('#notifications').append "> #{notification}\n"
+  $('#notifications').scrollTop $('#notifications')[0].scrollHeight
+
 setupLevel = (level) ->
   socket.removeEventListener 'players', pickName
-  screen = new Screen $('#screen')[0], level, playerName
-  $('#screen').css 'display', 'block'
-  socket.on 'display', screen.display
-  socket.on 'stats', screen.displayStats
+  screen = new Screen $('canvas')[0], level, playerName
+  $('#container').show()
 
 class Screen
 

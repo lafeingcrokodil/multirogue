@@ -181,6 +181,7 @@ C++ TODO
 - upgraded to Cedar-14 on Heroku
 - updated packages
 - every level has some stationary emus that can be attacked
+- switched from console.log to debug
 - started adding item classes
 - players pick names before joining
 - other rogues are greyed out
@@ -189,17 +190,26 @@ C++ TODO
 - refactored code (front end and back end)
 - started paving the way for hit/miss/etc. notifications
 - emus now retaliate when attacked
-- one of each type of monsters is spawned on each level
+=====================================================================
+
+=====================================================================
+22.06.2015
+---------------------------------------------------------------------
+- one of each type of monster is spawned on each level
+=====================================================================
+
+=====================================================================
+23.06.2015
+---------------------------------------------------------------------
+- notifications (e.g. hit/miss) are printed in browser
 =====================================================================
 
 =====================================================================
 UPCOMING
 ---------------------------------------------------------------------
-- notifications (e.g. hit/miss) are printed in browser
 - rogues regenerate health
 - maximum hit points increase when rogues level up
-- attacking an emu makes it clumsily chase you
 - levels are randomly generated
 - levels are initially unexplored
-- switched from console.log to debug
+- attacking monsters makes them clumsily chase you
 =====================================================================

@@ -17,7 +17,7 @@ class MultiRogueServer
       socket.on 'join', @addPlayer(socket)
 
   addPlayer: (socket) => (name) =>
-    debug('server') "[#{@getIP socket}] #{name} joined."
+    @report 'join', { name, ip: @getIP socket }
 
     rogue = new Rogue name, socket
     @players.push rogue
@@ -29,7 +29,7 @@ class MultiRogueServer
     socket.on 'error', (err) -> debug('error') err.stack
 
   removePlayer: (rogue) => =>
-    debug('server') "[#{@getIP rogue.socket}] #{rogue.name} left."
+    @report 'disconnect', { name: rogue.name, ip: @getIP rogue.socket }
     _.remove @players, rogue
     rogue.dungeonLevel.removeCreature rogue
 
@@ -75,16 +75,27 @@ class MultiRogueServer
 
   report: (event, data) =>
     switch event
+      when 'join'
+        { name, ip } = data
+        debug('server') "[#{ip}] #{name} joined"
+        @broadcast 'notify', "#{name} joined"
+      when 'disconnect'
+        { name, ip } = data
+        debug('server') "[#{ip}] #{name} left"
+        @broadcast 'notify', "#{name} left"
       when 'hit'
         { attacker, victim, hitPoints, damage } = data
         hitPointStr = "#{data.hitPoints} -> #{data.hitPoints - data.damage}"
         debug('game') "#{attacker.name} hit #{victim.name} (#{hitPointStr})"
+        @broadcast 'notify', "#{attacker.name} hit #{victim.name}"
       when 'miss'
         { attacker, victim } = data
         debug('game') "#{attacker.name} missed #{victim.name}"
+        @broadcast 'notify', "#{attacker.name} missed #{victim.name}"
       when 'defeat'
         { attacker, victim } = data
         debug('game') "#{attacker.name} defeated #{victim.name}"
+        @broadcast 'notify', "#{attacker.name} defeated #{victim.name}"
 
   broadcast: (event, data) =>
     @io.emit event, data
