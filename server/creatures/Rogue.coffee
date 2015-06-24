@@ -1,7 +1,7 @@
 EventEmitter = require('events').EventEmitter
 
-Dice  = require '../Dice'
-Level = require './Level'
+Dice   = require '../Dice'
+levels = require './levels'
 
 Food     = require '../items/Food'
 RingMail = require '../items/armour/RingMail'
@@ -13,10 +13,10 @@ class Rogue extends EventEmitter
   module.exports = Rogue
 
   type: 'ROGUE'
-  level: 1
+  level: levels[0]
   experience: 0
-  maxHitPoints: 20
-  hitPoints: 20
+  maxHitPoints: 12
+  hitPoints: 12
   maxStrength: 16
   strength: 16
   gold: 0
@@ -38,7 +38,7 @@ class Rogue extends EventEmitter
     creature.type is 'ROGUE'
 
   getStats: =>
-    level        : @level
+    level        : @level.number
     experience   : Math.floor @experience
     maxHitPoints : @maxHitPoints
     hitPoints    : @hitPoints
@@ -48,7 +48,7 @@ class Rogue extends EventEmitter
     gold         : @gold
 
   getHitChance: =>
-    levelBonus = @level
+    levelBonus = @level.number
     strengthBonus = switch
       when @strength < 8 then @strength - 7
       when @strength <= 16 then 0
@@ -86,9 +86,17 @@ class Rogue extends EventEmitter
     @socket.emit 'stats', @getStats()
     return @hitPoints <= 0
 
-  changeExperience: (dExp) =>
+  addExperience: (dExp) =>
     @experience += dExp
-    @level = Level.update @level, @experience
+    currLevelNumber = @level.number
+    nextLevel = levels[@level.number]
+    while nextLevel and @experience >= nextLevel.minExp
+      @level = nextLevel
+      @maxHitPoints += Dice.roll '1d10'
+      @hitPoints += Dice.roll '1d10'
+      nextLevel = levels[@level.number]
+    if @level.number > currLevelNumber
+      @socket.emit 'notify', "Welcome to level #{@level.number}!"
     @socket.emit 'stats', @getStats()
 
   wear: (armour) =>
@@ -103,10 +111,9 @@ class Rogue extends EventEmitter
     count = 0
     return =>
       count++
-      { healDice, healDelay } = Level.get @level
-      if count >= healDelay
+      if count >= @level.healDelay
         if @hitPoints < @maxHitPoints
-          healAmount = Dice.roll healDice
+          healAmount = Dice.roll @level.healDice
           @hitPoints = Math.min @maxHitPoints, @hitPoints + healAmount
           @socket.emit 'stats', @getStats()
         count = 0

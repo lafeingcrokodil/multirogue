@@ -36,7 +36,7 @@ class MultiRogueServer
   handleDefeat: (attacker, victim) =>
     @report 'defeat', { attacker, victim }
     if attacker.type is 'ROGUE'
-      attacker.changeExperience victim.getExperience()
+      attacker.addExperience victim.getExperience()
     victim.dungeonLevel.removeCreature victim
 
   move: (creature, dRow, dCol) =>
@@ -53,6 +53,8 @@ class MultiRogueServer
         creature.emit 'move' if creature.type is 'ROGUE'
       else if occupant and occupant.type isnt 'ROGUE'
         @meleeAttack occupant, creature
+    else # resting
+      creature.emit 'move' if creature.type is 'ROGUE'
 
   meleeAttack: (attacker, victim) =>
     hitChance = attacker.getHitChance() - victim.getBlockChance()

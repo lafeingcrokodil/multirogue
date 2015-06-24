@@ -207,13 +207,14 @@ C++ TODO
 =====================================================================
 24.06.2015
 ---------------------------------------------------------------------
-- rogues regenerate health
+- rogues regenerate health (when moving or resting)
+- hit points increase when rogues level up
+- reduced initial hit points to 12 (from 20)
 =====================================================================
 
 =====================================================================
 UPCOMING
 ---------------------------------------------------------------------
-- maximum hit points increase when rogues level up
 - levels are randomly generated
 - levels are initially unexplored
 - attacking monsters makes them clumsily chase you
