@@ -32,6 +32,7 @@ class Rogue extends EventEmitter
     @rings = {}
     @wear @inventory['b']
     @wield @inventory['c']
+    @.on 'move', @regenerate()
 
   isAlly: (creature) =>
     creature.type is 'ROGUE'
@@ -97,3 +98,15 @@ class Rogue extends EventEmitter
   wield: (weapon) =>
     if weapon.type is 'WEAPON'
       @weapon = weapon
+
+  regenerate: =>
+    count = 0
+    return =>
+      count++
+      { healDice, healDelay } = Level.get @level
+      if count >= healDelay
+        if @hitPoints < @maxHitPoints
+          healAmount = Dice.roll healDice
+          @hitPoints = Math.min @maxHitPoints, @hitPoints + healAmount
+          @socket.emit 'stats', @getStats()
+        count = 0

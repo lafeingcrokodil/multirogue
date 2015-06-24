@@ -50,6 +50,7 @@ class MultiRogueServer
       if victory or not occupant
         creature.dungeonLevel.unoccupy oldPos.row, oldPos.col
         creature.dungeonLevel.occupy creature, newPos.row, newPos.col
+        creature.emit 'move' if creature.type is 'ROGUE'
       else if occupant and occupant.type isnt 'ROGUE'
         @meleeAttack occupant, creature
 
