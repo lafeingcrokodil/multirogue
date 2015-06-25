@@ -213,9 +213,24 @@ C++ TODO
 =====================================================================
 
 =====================================================================
+25.06.2015
+---------------------------------------------------------------------
+- removed obsolete test for level module
+- renamed "Dice" module to "Random" and added getInt() method
+- finished first working version of room and passage generator
+=====================================================================
+
+=====================================================================
 UPCOMING
 ---------------------------------------------------------------------
-- levels are randomly generated
+- each randomly-generated level gets a randomly-placed staircase
+- server uses randomly-generated levels
 - levels are initially unexplored
+- levels include weapons and armour that can be picked up and used
+- monsters are spawned based on dungeon level
 - attacking monsters makes them clumsily chase you
+- levels include treasure rooms
+- levels include dead ends
+- levels include winding passages
+- levels include mazes
 =====================================================================
