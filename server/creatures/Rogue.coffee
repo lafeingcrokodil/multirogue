@@ -1,6 +1,6 @@
 EventEmitter = require('events').EventEmitter
 
-Dice   = require '../Dice'
+Random = require '../Random'
 levels = require './levels'
 
 Food     = require '../items/Food'
@@ -75,7 +75,7 @@ class Rogue extends EventEmitter
       when @strength < 31 then 5
       when @strength >= 31 then 6
     weaponBonus = @weapon?.damageBonus or 0
-    damage = Dice.roll(baseDamageDice) + weaponBonus + strengthBonus
+    damage = Random.roll(baseDamageDice) + weaponBonus + strengthBonus
     return Math.max damage, 0
 
   getArmourClass: =>
@@ -92,8 +92,8 @@ class Rogue extends EventEmitter
     nextLevel = levels[@level.number]
     while nextLevel and @experience >= nextLevel.minExp
       @level = nextLevel
-      @maxHitPoints += Dice.roll '1d10'
-      @hitPoints += Dice.roll '1d10'
+      @maxHitPoints += Random.roll '1d10'
+      @hitPoints += Random.roll '1d10'
       nextLevel = levels[@level.number]
     if @level.number > currLevelNumber
       @socket.emit 'notify', "Welcome to level #{@level.number}!"
@@ -113,7 +113,7 @@ class Rogue extends EventEmitter
       count++
       if count >= @level.healDelay
         if @hitPoints < @maxHitPoints
-          healAmount = Dice.roll @level.healDice
+          healAmount = Random.roll @level.healDice
           @hitPoints = Math.min @maxHitPoints, @hitPoints + healAmount
           @socket.emit 'stats', @getStats()
         count = 0

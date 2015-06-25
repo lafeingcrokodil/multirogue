@@ -1,11 +1,11 @@
-Dice = require '../Dice'
+Random = require '../Random'
 
 class Monster
   module.exports = Monster
 
   constructor: ->
     hitDice = "#{@level}d8"
-    @hitPoints = @maxHitPoints = Dice.roll hitDice
+    @hitPoints = @maxHitPoints = Random.roll hitDice
 
   isAlly: (creature) =>
     creature.type isnt 'ROGUE'
@@ -19,7 +19,7 @@ class Monster
     return 5 * armourBonus
 
   getDamage: (damageDice) =>
-    Dice.roll damageDice
+    Random.roll damageDice
 
   getExperience: =>
     @baseExp + Math.floor(@expBonus * @maxHitPoints)

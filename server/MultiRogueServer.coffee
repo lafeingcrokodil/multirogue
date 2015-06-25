@@ -1,7 +1,7 @@
 _     = require 'lodash'
 debug = require 'debug'
 
-Dice    = require './Dice'
+Random  = require './Random'
 Dungeon = require './dungeon/Dungeon'
 Rogue   = require './creatures/Rogue'
 
@@ -59,7 +59,7 @@ class MultiRogueServer
   meleeAttack: (attacker, victim) =>
     hitChance = attacker.getHitChance() - victim.getBlockChance()
     for damageDice in attacker.damageDice.split '+'
-      if Dice.roll('1d100') <= hitChance
+      if Random.roll('1d100') <= hitChance
         damage = attacker.getDamage damageDice
         @report 'hit', { attacker, victim, hitPoints: victim.hitPoints, damage }
         victory = victim.takeDamage damage

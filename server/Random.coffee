@@ -14,4 +14,8 @@ roll = (diceStr) ->
 rollDie = (sides) ->
   Math.floor (Math.random() * sides) + 1
 
-module.exports = { roll }
+# returns random integer between min and max (inclusive)
+getInt = (min, max) ->
+  Math.floor (Math.random() * (max - min + 1)) + min
+
+module.exports = { roll, getInt }
