@@ -23,10 +23,18 @@ opposites =
   WEST  : 'EAST'
 
 generate = ->
+  numRooms = Random.getInt 6, 9
+  quadrantsWithRooms = _.sample [0..8], numRooms
   quadrants = [0..8].map (index) ->
     { min, max } = getQuadrantBounds index
-    room = generateRoom min, max
-    return { index, room }
+    if index in quadrantsWithRooms
+      room = generateRoom min, max
+      return { index, room }
+    else
+      fixPoint =
+        row: Random.getInt min.row + 1, max.row - 1
+        col: Random.getInt min.col + 1, max.col - 1
+      return { index, fixPoint }
 
   passages = getPassages quadrants, getEdges()
 
@@ -82,28 +90,32 @@ getEdges = ->
 
 getPassages = (quadrants, edges) ->
   edges.map (edge) ->
-    { source, dest } = edge
-    direction = adjacencies[source][dest]
-    sourceDoor = getDoorCoords quadrants[source].room, direction
-    destDoor = getDoorCoords quadrants[dest].room, opposites[direction]
-    passage = [sourceDoor, null, null, null, null, destDoor]
+    direction = adjacencies[edge.source][edge.dest]
+    directions = { source: direction, dest: opposites[direction] }
+    endpoints = {}
+    for x in ['source', 'dest']
+      if quadrants[edge[x]].room
+        endpoints[x] = getDoorCoords quadrants[edge[x]].room, directions[x]
+      else
+        endpoints[x] = quadrants[edge[x]].fixPoint
+    passage = [endpoints.source, null, null, null, null, endpoints.dest]
     switch direction
       when 'NORTH'
-        passage[1] = { row: sourceDoor.row - 1, col: sourceDoor.col }
-        passage[4] = { row: destDoor.row + 1, col: destDoor.col }
+        passage[1] = { row: passage[0].row - 1, col: passage[0].col }
+        passage[4] = { row: passage[5].row + 1, col: passage[5].col }
       when 'SOUTH'
-        passage[1] = { row: sourceDoor.row + 1, col: sourceDoor.col }
-        passage[4] = { row: destDoor.row - 1, col: destDoor.col }
+        passage[1] = { row: passage[0].row + 1, col: passage[0].col }
+        passage[4] = { row: passage[5].row - 1, col: passage[5].col }
       when 'EAST'
-        passage[1] = { row: sourceDoor.row, col: sourceDoor.col + 1 }
-        passage[4] = { row: destDoor.row, col: destDoor.col - 1 }
+        passage[1] = { row: passage[0].row, col: passage[0].col + 1 }
+        passage[4] = { row: passage[5].row, col: passage[5].col - 1 }
       when 'WEST'
-        passage[1] = { row: sourceDoor.row, col: sourceDoor.col - 1 }
-        passage[4] = { row: destDoor.row, col: destDoor.col + 1 }
-    switch _.sample ['VERTICAL', 'HORIZONTAL']
+        passage[1] = { row: passage[0].row, col: passage[0].col - 1 }
+        passage[4] = { row: passage[5].row, col: passage[5].col + 1 }
+    switch _.sample ['VERTICAL', 'HORIZONTAL'] # initial direction
       when 'VERTICAL'
-        minRow = Math.min sourceDoor.row, destDoor.row
-        maxRow = Math.max sourceDoor.row, destDoor.row
+        minRow = Math.min passage[0].row, passage[5].row
+        maxRow = Math.max passage[0].row, passage[5].row
         passage[2] =
           row: Random.getInt minRow + 1, maxRow - 1
           col: passage[1].col
@@ -111,8 +123,8 @@ getPassages = (quadrants, edges) ->
           row: passage[2].row
           col: passage[4].col
       when 'HORIZONTAL'
-        minCol = Math.min sourceDoor.col, destDoor.col
-        maxCol = Math.max sourceDoor.col, destDoor.col
+        minCol = Math.min passage[0].col, passage[5].col
+        maxCol = Math.max passage[0].col, passage[5].col
         passage[2] =
           row: passage[1].row
           col: Random.getInt minCol + 1, maxCol - 1
@@ -124,23 +136,25 @@ getPassages = (quadrants, edges) ->
 getDoorCoords = ({ topLeft, bottomRight }, direction) ->
   switch direction
     when 'NORTH'
-      row: topLeft.row
-      col: Random.getInt topLeft.col + 1, bottomRight.col - 1
+      row = topLeft.row
+      col = Random.getInt topLeft.col + 1, bottomRight.col - 1
     when 'SOUTH'
-      row: bottomRight.row
-      col: Random.getInt topLeft.col + 1, bottomRight.col - 1
+      row = bottomRight.row
+      col = Random.getInt topLeft.col + 1, bottomRight.col - 1
     when 'EAST'
-      row: Random.getInt topLeft.row + 1, bottomRight.row - 1
-      col: bottomRight.col
+      row = Random.getInt topLeft.row + 1, bottomRight.row - 1
+      col = bottomRight.col
     when 'WEST'
-      row: Random.getInt topLeft.row + 1, bottomRight.row - 1
-      col: topLeft.col
+      row = Random.getInt topLeft.row + 1, bottomRight.row - 1
+      col = topLeft.col
+  return { row, col, isDoor: true }
 
 getAdjacentIndices = (index) ->
   _.keys(adjacencies[index]).map (adjacentIndex) -> parseInt adjacentIndex, 10
 
 getStaircaseCoords = (quadrants) ->
-  { room } = _.sample quadrants
+  quadrantsWithRooms = quadrants.filter (quadrant) -> quadrant.room
+  { room } = _.sample quadrantsWithRooms
 
   row: Random.getInt room.topLeft.row + 1, room.bottomRight.row - 1
   col: Random.getInt room.topLeft.col + 1, room.bottomRight.col - 1
@@ -149,6 +163,7 @@ toString = (quadrants, passages, staircase) ->
   level = ((' ' for col in [1..COLUMNS]) for row in [1..ROWS])
 
   for quadrant in quadrants
+    continue unless quadrant.room
     { topLeft, bottomRight } = quadrant.room
     for row in [topLeft.row, bottomRight.row]
       for col in [topLeft.col..bottomRight.col]
@@ -169,7 +184,7 @@ toString = (quadrants, passages, staircase) ->
         for col in [vertex.col..nextVertex.col]
           level[vertex.row][col] = '#'
     for i in [0, passage.length - 1]
-      level[passage[i].row][passage[i].col] = '+'
+      level[passage[i].row][passage[i].col] = if passage[i].isDoor then '+' else '#'
 
   level[staircase.row][staircase.col] = '%'
 
