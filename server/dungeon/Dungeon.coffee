@@ -1,6 +1,3 @@
-fs   = require 'fs'
-path = require 'path'
-
 Level = require './Level'
 
 class Dungeon
@@ -9,9 +6,8 @@ class Dungeon
   levels: []
 
   constructor: ->
-    levelsFolder = path.join 'server', 'dungeon', 'levels'
-    fs.readdirSync(levelsFolder).map (filename) =>
-      @levels.push new Level(path.join(levelsFolder, filename))
+    for i in [1..21]
+      @levels.push new Level i
 
   getAdjacentLevel: (level, direction) =>
     levelIndex = parseInt(level.name, 10) - 1

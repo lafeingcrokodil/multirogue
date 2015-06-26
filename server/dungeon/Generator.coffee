@@ -22,7 +22,7 @@ opposites =
   EAST  : 'WEST'
   WEST  : 'EAST'
 
-generate = ->
+generateLevel = ->
   numRooms = Random.getInt 6, 9
   quadrantsWithRooms = _.sample [0..8], numRooms
   quadrants = [0..8].map (index) ->
@@ -188,7 +188,6 @@ toString = (quadrants, passages, staircase) ->
 
   level[staircase.row][staircase.col] = '%'
 
-  return (level[row].join '' for row in [0..level.length-1]).join '\n'
+  return level
 
-unless module.parent
-  console.log generate()
+module.exports = { generateLevel }

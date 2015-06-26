@@ -1,16 +1,16 @@
-_    = require 'lodash'
-fs   = require 'fs'
-path = require 'path'
+_ = require 'lodash'
 
-symbols  = require './symbols'
-monsters = require '../creatures/monsters'
+symbols   = require './symbols'
+monsters  = require '../creatures/monsters'
+Generator = require './Generator'
 
 class Level
   module.exports = Level
 
-  constructor: (filePath) ->
-    @tiles = @loadFromFile filePath
-    @name = path.basename filePath, '.txt'
+  constructor: (index) ->
+    @tiles = Generator.generateLevel().map (row) ->
+      row.map (char) -> { terrain: char }
+    @name = "#{index}"
 
     # calculate level size
     @rows = @tiles.length
@@ -21,15 +21,6 @@ class Level
 
     for name, Monster of monsters
       @addCreature new Monster
-
-  loadFromFile: (filePath) ->
-    levelFile = fs.readFileSync filePath, 'utf8'
-
-    tiles = []
-    for row in levelFile.split /[\r\n]+/
-      tiles.push row.split('').map (char) -> { terrain: char }
-
-    return tiles
 
   broadcast: (event, data) =>
     for rogue in @rogues

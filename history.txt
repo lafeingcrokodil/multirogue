@@ -226,12 +226,19 @@ C++ TODO
 ---------------------------------------------------------------------
 - each randomly-generated level gets a randomly-placed staircase
 - levels include dead ends and winding passages
+- server uses randomly-generated levels
+=====================================================================
+
+=====================================================================
+BUGS
+---------------------------------------------------------------------
+- when levelling up, hit points can surpass maximum hit points
 =====================================================================
 
 =====================================================================
 UPCOMING
 ---------------------------------------------------------------------
-- server uses randomly-generated levels
+- display hit/miss/etc. notifications above map (as in original game)
 - levels are initially unexplored
 - levels include gold that can be picked up
 - levels include weapons and armour that can be picked up and used
