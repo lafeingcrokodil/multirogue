@@ -93,7 +93,7 @@ class Rogue extends EventEmitter
     while nextLevel and @experience >= nextLevel.minExp
       @level = nextLevel
       @maxHitPoints += Random.roll '1d10'
-      @hitPoints += Random.roll '1d10'
+      @hitPoints = Math.min @hitPoints + Random.roll('1d10'), @maxHitPoints
       nextLevel = levels[@level.number]
     if @level.number > currLevelNumber
       @socket.emit 'notify', "Welcome to level #{@level.number}!"

@@ -227,12 +227,7 @@ C++ TODO
 - each randomly-generated level gets a randomly-placed staircase
 - levels include dead ends and winding passages
 - server uses randomly-generated levels
-=====================================================================
-
-=====================================================================
-BUGS
----------------------------------------------------------------------
-- when levelling up, hit points can surpass maximum hit points
+- when levelling up, hit points can't surpass maximum hit points
 =====================================================================
 
 =====================================================================
