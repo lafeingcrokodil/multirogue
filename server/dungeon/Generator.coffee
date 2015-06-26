@@ -28,10 +28,11 @@ generate = ->
     room = generateRoom min, max
     return { index, room }
 
-  edges = getEdges()
-  passages = getPassages quadrants, edges
+  passages = getPassages quadrants, getEdges()
 
-  return toString quadrants, passages
+  staircase = getStaircaseCoords quadrants
+
+  return toString quadrants, passages, staircase
 
 getQuadrantBounds = (index) ->
   min:
@@ -49,9 +50,6 @@ generateRoom = (min, max) ->
     row: Random.getInt topLeft.row + 4, max.row
     col: Random.getInt topLeft.col + 4, max.col
   return { topLeft, bottomRight }
-
-getAdjacentIndices = (index) ->
-  _.keys(adjacencies[index]).map (adjacentIndex) -> parseInt adjacentIndex, 10
 
 getEdges = ->
   connected = [0]
@@ -82,21 +80,6 @@ getEdges = ->
 
   return edges
 
-getDoorCoords = ({ topLeft, bottomRight }, direction) ->
-  switch direction
-    when 'NORTH'
-      row: topLeft.row
-      col: Random.getInt topLeft.col + 1, bottomRight.col - 1
-    when 'SOUTH'
-      row: bottomRight.row
-      col: Random.getInt topLeft.col + 1, bottomRight.col - 1
-    when 'EAST'
-      row: Random.getInt topLeft.row + 1, bottomRight.row - 1
-      col: bottomRight.col
-    when 'WEST'
-      row: Random.getInt topLeft.row + 1, bottomRight.row - 1
-      col: topLeft.col
-
 getPassages = (quadrants, edges) ->
   edges.map (edge) ->
     { source, dest } = edge
@@ -117,28 +100,52 @@ getPassages = (quadrants, edges) ->
       when 'WEST'
         passage[1] = { row: sourceDoor.row, col: sourceDoor.col - 1 }
         passage[4] = { row: destDoor.row, col: destDoor.col + 1 }
-    initialDir = Random.roll '1d2'
-    if initialDir is 1 # move vertically first
-      minRow = Math.min sourceDoor.row, destDoor.row
-      maxRow = Math.max sourceDoor.row, destDoor.row
-      passage[2] =
-        row: Random.getInt minRow + 1, maxRow - 1
-        col: passage[1].col
-      passage[3] =
-        row: passage[2].row
-        col: passage[4].col
-    else if initialDir is 2 # move horizontally first
-      minCol = Math.min sourceDoor.col, destDoor.col
-      maxCol = Math.max sourceDoor.col, destDoor.col
-      passage[2] =
-        row: passage[1].row
-        col: Random.getInt minCol + 1, maxCol - 1
-      passage[3] =
-        row: passage[4].row
-        col: passage[2].col
+    switch _.sample ['VERTICAL', 'HORIZONTAL']
+      when 'VERTICAL'
+        minRow = Math.min sourceDoor.row, destDoor.row
+        maxRow = Math.max sourceDoor.row, destDoor.row
+        passage[2] =
+          row: Random.getInt minRow + 1, maxRow - 1
+          col: passage[1].col
+        passage[3] =
+          row: passage[2].row
+          col: passage[4].col
+      when 'HORIZONTAL'
+        minCol = Math.min sourceDoor.col, destDoor.col
+        maxCol = Math.max sourceDoor.col, destDoor.col
+        passage[2] =
+          row: passage[1].row
+          col: Random.getInt minCol + 1, maxCol - 1
+        passage[3] =
+          row: passage[4].row
+          col: passage[2].col
     return passage
 
-toString = (quadrants, passages) ->
+getDoorCoords = ({ topLeft, bottomRight }, direction) ->
+  switch direction
+    when 'NORTH'
+      row: topLeft.row
+      col: Random.getInt topLeft.col + 1, bottomRight.col - 1
+    when 'SOUTH'
+      row: bottomRight.row
+      col: Random.getInt topLeft.col + 1, bottomRight.col - 1
+    when 'EAST'
+      row: Random.getInt topLeft.row + 1, bottomRight.row - 1
+      col: bottomRight.col
+    when 'WEST'
+      row: Random.getInt topLeft.row + 1, bottomRight.row - 1
+      col: topLeft.col
+
+getAdjacentIndices = (index) ->
+  _.keys(adjacencies[index]).map (adjacentIndex) -> parseInt adjacentIndex, 10
+
+getStaircaseCoords = (quadrants) ->
+  { room } = _.sample quadrants
+
+  row: Random.getInt room.topLeft.row + 1, room.bottomRight.row - 1
+  col: Random.getInt room.topLeft.col + 1, room.bottomRight.col - 1
+
+toString = (quadrants, passages, staircase) ->
   level = ((' ' for col in [1..COLUMNS]) for row in [1..ROWS])
 
   for quadrant in quadrants
@@ -163,6 +170,8 @@ toString = (quadrants, passages) ->
           level[vertex.row][col] = '#'
     for i in [0, passage.length - 1]
       level[passage[i].row][passage[i].col] = '+'
+
+  level[staircase.row][staircase.col] = '%'
 
   return (level[row].join '' for row in [0..level.length-1]).join '\n'
 

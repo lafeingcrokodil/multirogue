@@ -218,12 +218,18 @@ C++ TODO
 - removed obsolete test for level module
 - renamed "Dice" module to "Random" and added getInt() method
 - finished first working version of room and passage generator
+- started using master branch again (why not?)
+=====================================================================
+
+=====================================================================
+26.06.2015
+---------------------------------------------------------------------
+- each randomly-generated level gets a randomly-placed staircase
 =====================================================================
 
 =====================================================================
 UPCOMING
 ---------------------------------------------------------------------
-- each randomly-generated level gets a randomly-placed staircase
 - server uses randomly-generated levels
 - levels are initially unexplored
 - levels include weapons and armour that can be picked up and used
