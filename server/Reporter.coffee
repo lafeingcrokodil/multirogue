@@ -20,7 +20,7 @@ class Reporter
         @broadcast 'notify', "#{name} left"
       when 'hit'
         { attacker, victim, hitPoints, damage } = data
-        hitPointStr = "#{data.hitPoints} -> #{data.hitPoints - data.damage}"
+        hitPointStr = "#{hitPoints + damage} -> #{hitPoints}"
         debug('game') "#{attacker.name} hit #{victim.name} (#{hitPointStr})"
         if attacker.type is 'ROGUE'
           @messages[attacker.name].push "You hit the #{victim.name}"

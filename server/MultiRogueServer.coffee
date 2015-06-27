@@ -62,18 +62,22 @@ class MultiRogueServer
       creature.emit 'move' if creature.type is 'ROGUE'
 
   meleeAttack: (attacker, victim) =>
+    victory = false
+    totalDamage = null
     hitChance = attacker.getHitChance() - victim.getBlockChance()
     for damageDice in attacker.damageDice.split '+'
       if Random.roll('1d100') <= hitChance
         damage = attacker.getDamage damageDice
-        @reporter.report 'hit', { attacker, victim, hitPoints: victim.hitPoints, damage }
+        totalDamage += damage
         victory = victim.takeDamage damage
-        if victory
-          @handleDefeat attacker, victim
-          return true # victim was defeated
-      else
-        @reporter.report 'miss', { attacker, victim }
-    return false # victim wasn't defeated
+        break if victory
+    if totalDamage?
+      @reporter.report 'hit', { attacker, victim, hitPoints: victim.hitPoints, damage: totalDamage }
+    else
+      @reporter.report 'miss', { attacker, victim }
+    if victory
+      @handleDefeat attacker, victim
+    return victory
 
   useStaircase: (rogue, direction) =>
     if rogue.dungeonLevel.isStaircase rogue.row, rogue.col
