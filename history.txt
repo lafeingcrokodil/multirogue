@@ -235,6 +235,7 @@ C++ TODO
 ---------------------------------------------------------------------
 - display hit/miss/etc. notifications above map (as in original game)
 - don't display separate message for each swing
+- updated package.json
 =====================================================================
 
 =====================================================================
