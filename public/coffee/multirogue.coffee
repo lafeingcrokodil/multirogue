@@ -1,11 +1,15 @@
 playerName = ''
 socket = io()
 screen = null
+messages = []
 
 $(document).ready ->
   socket.on 'players', pickName
   socket.on 'level', setupLevel
   socket.on 'notify', displayNotification
+  socket.on 'narration', (msgArray) ->
+    messages = messages.concat msgArray
+    screen.displayNarration messages.shift()
   socket.on 'display', (data) -> screen?.display data
   socket.on 'stats', (stats) -> screen?.displayStats stats
 
@@ -36,29 +40,34 @@ validate = (name, existingPlayers) ->
 
 addKeyListener = ->
   $(document).keypress (e) ->
-    switch String.fromCharCode(e.charCode) # TODO: check browser compatibility
-      when 'h', '4'
-        socket.emit 'move', { dRow: 0, dCol: -1 }  # move left
-      when 'l', '6'
-        socket.emit 'move', { dRow: 0, dCol: 1 }   # move right
-      when 'k', '8'
-        socket.emit 'move', { dRow: -1, dCol: 0 }  # move up
-      when 'j', '2'
-        socket.emit 'move', { dRow: 1, dCol: 0 }   # move down
-      when 'y', '7'
-        socket.emit 'move', { dRow: -1, dCol: -1 } # move diagonally up and left
-      when 'u', '9'
-        socket.emit 'move', { dRow: -1, dCol: 1 }  # move diagonally up and right
-      when 'b', '1'
-        socket.emit 'move', { dRow: 1, dCol: -1 }  # move diagonally down and left
-      when 'n', '3'
-        socket.emit 'move', { dRow: 1, dCol: 1 }   # move diagonally down and right
-      when '.', '5'
-        socket.emit 'move', { dRow: 0, dCol: 0 }   # rest (no movement)
-      when '>'
-        socket.emit 'staircase', { direction: 'down' } # go down staircase
-      else return # don't prevent default for unrecognized keys
-    e.preventDefault()
+    charCode = String.fromCharCode(e.charCode) # TODO: check browser compatibility
+    if messages.length and charCode is ' '
+      screen.displayNarration messages.shift()
+      e.preventDefault()
+    else unless messages.length
+      switch charCode
+        when 'h', '4'
+          socket.emit 'move', { dRow: 0, dCol: -1 }  # move left
+        when 'l', '6'
+          socket.emit 'move', { dRow: 0, dCol: 1 }   # move right
+        when 'k', '8'
+          socket.emit 'move', { dRow: -1, dCol: 0 }  # move up
+        when 'j', '2'
+          socket.emit 'move', { dRow: 1, dCol: 0 }   # move down
+        when 'y', '7'
+          socket.emit 'move', { dRow: -1, dCol: -1 } # move diagonally up and left
+        when 'u', '9'
+          socket.emit 'move', { dRow: -1, dCol: 1 }  # move diagonally up and right
+        when 'b', '1'
+          socket.emit 'move', { dRow: 1, dCol: -1 }  # move diagonally down and left
+        when 'n', '3'
+          socket.emit 'move', { dRow: 1, dCol: 1 }   # move diagonally down and right
+        when '.', '5'
+          socket.emit 'move', { dRow: 0, dCol: 0 }   # rest (no movement)
+        when '>'
+          socket.emit 'staircase', { direction: 'down' } # go down staircase
+        else return # don't prevent default for unrecognized keys
+      e.preventDefault()
 
 displayNotification = (notification) ->
   $('#notifications').append "> #{notification}\n"
@@ -106,6 +115,11 @@ class Screen
     @context.clearRect @getX(col), @getY(row-1) + 1, @getTextWidth(text), @charHeight
     @context.fillText text, @getX(col), @getY(row)
     @context.fillStyle = 'white'
+
+  displayNarration: (message) =>
+    message += '--More--' if messages.length
+    @context.clearRect 0, 1, @width, @charHeight + 1
+    @context.fillText message, 0, @getY(0)
 
   displayStats: (stats) =>
     hp = "#{stats.hitPoints}(#{stats.maxHitPoints})"

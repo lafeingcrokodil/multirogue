@@ -96,7 +96,7 @@ class Rogue extends EventEmitter
       @hitPoints = Math.min @hitPoints + Random.roll('1d10'), @maxHitPoints
       nextLevel = levels[@level.number]
     if @level.number > currLevelNumber
-      @socket.emit 'notify', "Welcome to level #{@level.number}!"
+      @emit 'levelup', @level.number
     @socket.emit 'stats', @getStats()
 
   wear: (armour) =>
