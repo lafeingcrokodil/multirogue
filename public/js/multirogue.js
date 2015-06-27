@@ -21,7 +21,14 @@
       return screen.displayNarration(messages.shift());
     });
     socket.on('display', function(data) {
-      return screen != null ? screen.display(data) : void 0;
+      var j, len, results, tile, tiles;
+      tiles = $.isArray(data) ? data : [data];
+      results = [];
+      for (j = 0, len = tiles.length; j < len; j++) {
+        tile = tiles[j];
+        results.push(screen != null ? screen.display(tile) : void 0);
+      }
+      return results;
     });
     return socket.on('stats', function(stats) {
       return screen != null ? screen.displayStats(stats) : void 0;

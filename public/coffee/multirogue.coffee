@@ -10,7 +10,10 @@ $(document).ready ->
   socket.on 'narration', (msgArray) ->
     messages = messages.concat msgArray
     screen.displayNarration messages.shift()
-  socket.on 'display', (data) -> screen?.display data
+  socket.on 'display', (data) ->
+    tiles = if $.isArray data then data else [data]
+    for tile in tiles
+      screen?.display tile
   socket.on 'stats', (stats) -> screen?.displayStats stats
 
 pickName = (existingPlayers) ->

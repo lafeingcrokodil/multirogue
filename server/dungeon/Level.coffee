@@ -8,8 +8,8 @@ class Level
   module.exports = Level
 
   constructor: (index) ->
-    @tiles = Generator.generateLevel().map (row) ->
-      row.map (char) -> { terrain: char }
+    @tiles = Generator.generateLevel().map (row, i) ->
+      row.map (char, j) -> { row: i, col: j, terrain: char, explored: [] }
     @name = "#{index}"
 
     # calculate level size
@@ -18,6 +18,7 @@ class Level
 
     @rogues   = [] # living rogues
     @monsters = [] # living monsters
+    @moveListeners = {}
 
     for name, Monster of monsters
       @addCreature new Monster
@@ -32,13 +33,20 @@ class Level
     list = if creature.type is 'ROGUE' then @rogues else @monsters
     list.push creature
     if creature.type is 'ROGUE'
+      @explore creature
+      @moveListeners[creature.name] = (data) =>
+        exploredTiles = @explore creature unless data?.resting
+        creature.socket.emit 'display', exploredTiles
+      creature.on 'move', @moveListeners[creature.name]
       creature.socket.emit 'level',
         name: @name
-        map: @getMap()
+        map: @getMap creature
         rogues: @rogues.map (rogue) -> _.pick rogue, 'row', 'col', 'name'
       creature.socket.emit 'stats', creature.getStats()
 
   removeCreature: (creature) =>
+    if creature.type is 'ROGUE'
+      creature.removeListener 'move', @moveListeners[creature.name]
     @unoccupy creature.row, creature.col
     list = if creature.type is 'ROGUE' then @rogues else @monsters
     _.remove list, creature
@@ -53,12 +61,11 @@ class Level
     @tiles[row][col].occupant = occupant
     occupant.row = row
     occupant.col = col
-    displayData = { text: @symbolAt(row, col), row, col, name: occupant.name }
-    @broadcast 'display', displayData
+    @broadcast 'display', @getDisplayData @tiles[row][col]
 
   unoccupy: (row, col) =>
     @tiles[row][col].occupant = null
-    @broadcast 'display', { text: @symbolAt(row, col), row, col }
+    @broadcast 'display', @getDisplayData @tiles[row][col]
 
   getRandomSpawnPos: =>
     loop # trial and error
@@ -90,23 +97,41 @@ class Level
   getOccupant: (row, col) =>
     return @tiles[row][col].occupant
 
+  explore: (rogue, tile) =>
+    exploredTiles = []
+    tile or= @tiles[rogue.row][rogue.col]
+    tile.explored.push rogue.name
+    exploredTiles.push @getDisplayData(tile)
+    for i in [-1..1]
+      for j in [-1..1]
+        neighbour = @tiles[tile.row + i]?[tile.col + j]
+        if neighbour and rogue.name not in neighbour.explored
+          if neighbour.terrain in [symbols.GROUND, symbols.STAIRCASE, symbols.TRAP]
+            additionalTiles = @explore rogue, neighbour
+            exploredTiles = exploredTiles.concat additionalTiles
+          else if tile.terrain isnt symbols.PASSAGE or neighbour.terrain in [symbols.PASSAGE, symbols.DOOR]
+            neighbour.explored.push rogue.name
+            exploredTiles.push @getDisplayData(neighbour)
+    return exploredTiles
+
   ###
   Returns a two-dimensional array containing the symbols
   currently visible on the level. For unoccupied tiles, the
   visible symbol is the terrain symbol and for occupied tiles
   it is the occupant's symbol (e.g. 'E', if it's an emu).
   ###
-  getMap: =>
+  getMap: (rogue) =>
     map = []
     for row in @tiles
-      map.push row.map (tile) => @getSymbol tile
+      map.push row.map (tile) =>
+        if rogue.name in tile.explored then @getSymbol tile else ' '
     return map
 
-  ###
-  Returns the symbol that is visible at the specified position.
-  ###
-  symbolAt: (row, col) =>
-    @getSymbol @tiles[row][col]
+  getDisplayData: (tile) =>
+    row  : tile.row
+    col  : tile.col
+    text : @getSymbol tile
+    name : tile.occupant.name if tile.occupant?.type is 'ROGUE'
 
   ###
   Returns the symbol that is visible on the specified tile.

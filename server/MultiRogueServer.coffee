@@ -59,7 +59,7 @@ class MultiRogueServer
         @meleeAttack occupant, creature
       @reporter.report 'end', creature
     else # resting
-      creature.emit 'move' if creature.type is 'ROGUE'
+      creature.emit 'move', { resting: true } if creature.type is 'ROGUE'
 
   meleeAttack: (attacker, victim) =>
     victory = false

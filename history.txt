@@ -236,12 +236,19 @@ C++ TODO
 - display hit/miss/etc. notifications above map (as in original game)
 - don't display separate message for each swing
 - updated package.json
+- levels are initially unexplored
+=====================================================================
+
+=====================================================================
+BUGS
+---------------------------------------------------------------------
+- rogues can skip corners by moving diagonally
+- players can see where other rogues have been (maybe not a bug?)
 =====================================================================
 
 =====================================================================
 UPCOMING
 ---------------------------------------------------------------------
-- levels are initially unexplored
 - levels include gold that can be picked up
 - levels include weapons and armour that can be picked up and used
 - monsters are spawned based on dungeon level
