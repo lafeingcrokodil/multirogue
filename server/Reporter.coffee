@@ -1,4 +1,4 @@
-debug = require 'debug'
+serverDebug = require('debug') 'server'
 
 class Reporter
   module.exports = Reporter
@@ -11,31 +11,31 @@ class Reporter
       when 'join'
         { name, ip } = data
         @messages[name] = []
-        debug('server') "[#{ip}] #{name} joined"
+        serverDebug "[#{ip}] #{name} joined"
         @broadcast 'notify', "#{name} joined"
       when 'disconnect'
         { name, ip } = data
         delete @messages[name]
-        debug('server') "[#{ip}] #{name} left"
+        serverDebug "[#{ip}] #{name} left"
         @broadcast 'notify', "#{name} left"
       when 'hit'
         { attacker, victim, hitPoints, damage } = data
         hitPointStr = "#{hitPoints + damage} -> #{hitPoints}"
-        debug('game') "#{attacker.name} hit #{victim.name} (#{hitPointStr})"
+        serverDebug "#{attacker.name} hit #{victim.name} (#{hitPointStr})"
         if attacker.type is 'ROGUE'
           @messages[attacker.name].push "You hit the #{victim.name}"
         if victim.type is 'ROGUE'
           @messages[victim.name].push "The #{attacker.name} hit you"
       when 'miss'
         { attacker, victim } = data
-        debug('game') "#{attacker.name} missed #{victim.name}"
+        serverDebug "#{attacker.name} missed #{victim.name}"
         if attacker.type is 'ROGUE'
           @messages[attacker.name].push "You missed the #{victim.name}"
         if victim.type is 'ROGUE'
           @messages[victim.name].push "The #{attacker.name} missed you"
       when 'defeat'
         { attacker, victim } = data
-        debug('game') "#{attacker.name} defeated #{victim.name}"
+        serverDebug "#{attacker.name} defeated #{victim.name}"
         @broadcast 'notify', "#{attacker.name} defeated #{victim.name}"
         if attacker.type is 'ROGUE'
           @messages[attacker.name].push "You defeated the #{victim.name}"
@@ -43,7 +43,7 @@ class Reporter
           @messages[victim.name].push "You were defeated by the #{attacker.name}"
       when 'levelup'
         { rogue, level } = data
-        debug('game') "#{rogue.name} reached level #{level}"
+        serverDebug "#{rogue.name} reached level #{level}"
         @broadcast 'notify', "#{rogue.name} levelled up"
         @messages[rogue.name].push "Welcome to level #{level}"
       when 'end'
