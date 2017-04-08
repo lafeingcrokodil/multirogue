@@ -24,7 +24,7 @@ opposites =
 
 generateLevel = ->
   numRooms = Random.getInt 6, 9
-  quadrantsWithRooms = _.sample [0..8], numRooms
+  quadrantsWithRooms = _.sampleSize [0..8], numRooms
   quadrants = [0..8].map (index) ->
     { min, max } = getQuadrantBounds index
     if index in quadrantsWithRooms

@@ -16,7 +16,7 @@ class MultiRogueServer
     @reporter = new Reporter io
     io.sockets.on 'connection', (socket) =>
       socket.on 'error', (err) -> debug('error') err.stack
-      socket.emit 'players', _.pluck(@players, 'name')
+      socket.emit 'players', _.map(@players, 'name')
       socket.on 'join', @addPlayer(socket)
 
   addPlayer: (socket) => (name) =>
