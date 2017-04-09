@@ -1,10 +1,11 @@
 _     = require 'lodash'
 debug = require 'debug'
 
-Random   = require './Random'
-Dungeon  = require './dungeon/Dungeon'
-Rogue    = require './creatures/Rogue'
-Reporter = require './Reporter'
+Random    = require './Random'
+Dungeon   = require './dungeon/Dungeon'
+Tombstone = require './dungeon/Tombstone'
+Rogue     = require './creatures/Rogue'
+Reporter  = require './Reporter'
 
 class MultiRogueServer
   module.exports = MultiRogueServer
@@ -42,6 +43,9 @@ class MultiRogueServer
     if attacker.type is 'ROGUE'
       attacker.addExperience victim.getExperience()
     victim.dungeonLevel.removeCreature victim
+    if victim.type is 'ROGUE'
+      tombstone = new Tombstone victim, 'killed', { attacker }
+      victim.socket.emit 'level', tombstone.toLevel()
 
   move: (creature, dRow, dCol) =>
     if dRow or dCol

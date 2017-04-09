@@ -27,3 +27,8 @@ class Monster
   takeDamage: (amount) =>
     @hitPoints -= amount
     return @hitPoints <= 0
+
+  # ASSUMPTION: 'an' should be used iff the creature's name starts with a vowel
+  # Override this method if the assumption doesn't hold (e.g. for 'unicorn').
+  getIndefiniteArticle: =>
+    return if /^[aeiou]/i.test @name then 'an' else 'a'
