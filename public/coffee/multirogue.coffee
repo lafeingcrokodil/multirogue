@@ -106,7 +106,7 @@ class Screen
 
   getTextWidth: (text) =>
     @context.font = @getFont()
-    return @context.measureText(text).width
+    return @context.measureText(text).width + 2
 
   getX: (col) => col * @charWidth
 
@@ -115,13 +115,13 @@ class Screen
   display: ({ text, row, col, name }) =>
     if name and name isnt @playerName
       @context.fillStyle = 'grey'
-    @context.clearRect @getX(col), @getY(row-1) + 1, @getTextWidth(text), @charHeight
+    @context.clearRect @getX(col) - 1, @getY(row-1) + 2, @getTextWidth(text), @charHeight
     @context.fillText text, @getX(col), @getY(row)
     @context.fillStyle = 'white'
 
   displayNarration: (message) =>
     message += '--More--' if messages.length
-    @context.clearRect 0, 1, @width, @charHeight + 1
+    @context.clearRect 0, 3, @width, @charHeight + 1
     @context.fillText message, 0, @getY(0)
 
   displayStats: (stats) =>
@@ -135,7 +135,7 @@ class Screen
     statStr += "Str: #{@pad(str, 8)}"
     statStr += "Arm: #{@pad(stats.armourClass.toString(), 4)}"
     statStr += "Exp: #{exp}"
-    @context.clearRect 0, @getY(@rows-1) + 1, @width, @charHeight + 1
+    @context.clearRect 0, @getY(@rows-1) + 2, @width, @charHeight + 1
     @context.fillText statStr, 0, @getY(@rows)
 
   displayLevel: ({ map, rogues }) =>
