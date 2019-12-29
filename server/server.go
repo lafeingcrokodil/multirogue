@@ -37,7 +37,7 @@ func (s *Server) Start() error {
 	http.Handle("/", fs)
 
 	// Configure websocket route.
-	http.HandleFunc("/ws", s.handleConnections)
+	http.HandleFunc("/ws", s.handleConnection)
 
 	// Start worker for handling incoming messages.
 	go s.handleMessages()
@@ -47,7 +47,7 @@ func (s *Server) Start() error {
 	return http.ListenAndServe(":8000", nil)
 }
 
-func (s *Server) handleConnections(w http.ResponseWriter, r *http.Request) {
+func (s *Server) handleConnection(w http.ResponseWriter, r *http.Request) {
 	// Upgrade initial GET request to a websocket.
 	ws, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
