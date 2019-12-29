@@ -7,13 +7,14 @@ import (
 	"github.com/gorilla/websocket"
 )
 
-var clients = make(map[*websocket.Conn]bool) // connected clients
-var broadcast = make(chan Message)           // broadcast channel
+// Server is a MultiRogue server.
+type Server struct {
+	clients   map[*websocket.Conn]bool
+	broadcast chan Message
+	upgrader  websocket.Upgrader
+}
 
-// Configure the upgrader
-var upgrader = websocket.Upgrader{}
-
-// Define our message object
+// Message is a chat message.
 type Message struct {
 	Email    string `json:"email"`
 	Username string `json:"username"`
@@ -21,61 +22,75 @@ type Message struct {
 }
 
 func main() {
-	// Create a simple file server
+	s := NewServer()
+	if err := s.Start(); err != nil {
+		log.Fatal("Error: ", err)
+	}
+}
+
+// NewServer returns a new Server instance.
+func NewServer() *Server {
+	return &Server{
+		clients:   make(map[*websocket.Conn]bool), // connected clients
+		broadcast: make(chan Message),             // broadcast channel
+		upgrader:  websocket.Upgrader{},           // for upgrading HTTP requests to web sockets
+	}
+}
+
+// Start starts the server on port 8000.
+func (s *Server) Start() error {
+	// Serve static assets.
 	fs := http.FileServer(http.Dir("./public"))
 	http.Handle("/", fs)
 
-	// Configure websocket route
-	http.HandleFunc("/ws", handleConnections)
+	// Configure websocket route.
+	http.HandleFunc("/ws", s.handleConnections)
 
-	// Start listening for incoming chat messages
-	go handleMessages()
+	// Start worker for handling incoming messages.
+	go s.handleMessages()
 
-	// Start the server on localhost port 8000 and log any errors
-	log.Println("http server started on :8000")
-	err := http.ListenAndServe(":8000", nil)
-	if err != nil {
-		log.Fatal("ListenAndServe: ", err)
-	}
+	// Start listening for incoming connections and messages.
+	log.Println("Starting server on port 8000...")
+	return http.ListenAndServe(":8000", nil)
 }
 
-func handleConnections(w http.ResponseWriter, r *http.Request) {
-	// Upgrade initial GET request to a websocket
-	ws, err := upgrader.Upgrade(w, r, nil)
+func (s *Server) handleConnections(w http.ResponseWriter, r *http.Request) {
+	// Upgrade initial GET request to a websocket.
+	ws, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
 		log.Fatal(err)
 	}
-	// Make sure we close the connection when the function returns
+	// Make sure we close the connection when the function returns.
 	defer ws.Close()
 
-	// Register our new client
-	clients[ws] = true
+	// Register the new client.
+	s.clients[ws] = true
 
 	for {
 		var msg Message
-		// Read in a new message as JSON and map it to a Message object
+		// Wait for a new message to come in and parse it.
 		err := ws.ReadJSON(&msg)
 		if err != nil {
-			log.Printf("error: %v", err)
-			delete(clients, ws)
+			log.Print("Warning: ", err)
+			delete(s.clients, ws)
 			break
 		}
-		// Send the newly received message to the broadcast channel
-		broadcast <- msg
+		// Send the newly received message to the broadcast channel.
+		s.broadcast <- msg
 	}
 }
 
-func handleMessages() {
+func (s *Server) handleMessages() {
 	for {
-		// Grab the next message from the broadcast channel
-		msg := <-broadcast
-		// Send it out to every client that is currently connected
-		for client := range clients {
+		// Read the next message from the broadcast channel.
+		msg := <-s.broadcast
+		// Send it out to every client that is currently connected.
+		for client := range s.clients {
 			err := client.WriteJSON(msg)
 			if err != nil {
-				log.Printf("error: %v", err)
+				log.Print("Warning: ", err)
 				client.Close()
-				delete(clients, client)
+				delete(s.clients, client)
 			}
 		}
 	}
