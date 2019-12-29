@@ -5,7 +5,7 @@ A multiplayer version of Rogue.
 
 ## Installation
 
-Make sure that you have Docker installed. For example, you can find instructions for installing the community edition [here](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
+Make sure that you have Docker installed. For example, you can find instructions for installing the community edition for Ubuntu [here](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
 
 Start the server by running
 
