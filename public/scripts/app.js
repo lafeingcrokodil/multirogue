@@ -15,8 +15,10 @@ new Vue({
     this.ws.addEventListener('message', function(e) {
       let msg = JSON.parse(e.data);
       self.chatContent += `<div class="chip">${msg.username}</div>${msg.message}<br/>`;
-      let element = document.getElementById('chat-messages');
-      element.scrollTop = element.scrollHeight; // auto scroll to the bottom
+      self.$nextTick(() => { // wait for DOM to be updated before scrolling
+        let element = document.getElementById('chat-messages');
+        element.scrollTop = element.scrollHeight; // auto scroll to the bottom
+      });
     });
   },
 
