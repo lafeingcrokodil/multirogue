@@ -9,7 +9,9 @@ test:
 
 build:
 	mkdir -p bin
-	go build -o bin/multirogue cmd/main.go
+	VERSION=$$(git describe --tag --always --dirty) && \
+		go build -o bin/multirogue -ldflags "-X main.version=$$VERSION" \
+		cmd/main.go
 
 docker-lint:
 	docker pull golangci/golangci-lint:latest
