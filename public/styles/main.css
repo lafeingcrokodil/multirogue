@@ -1,0 +1,13 @@
+body {
+  font-family: monospace;
+  color: #d0d0d0;
+  background-color: #202020;
+}
+
+#screen {
+  border: 1px solid #d0d0d0;
+  font-family: 'Courier New', Courier, monospace;
+  margin: 50px auto;
+  padding: 5px 7px 7px 7px;
+  width: fit-content;
+}
