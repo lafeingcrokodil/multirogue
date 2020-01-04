@@ -10,9 +10,9 @@ import (
 
 // Server is a MultiRogue server.
 type Server struct {
-	addr     string                   // TCP address to listen on
-	players  map[*websocket.Conn]bool // players that are currently connected
-	upgrader websocket.Upgrader       // for upgrading HTTP requests to websockets
+	addr     string                     // TCP address to listen on
+	players  map[string]*websocket.Conn // players that are currently connected
+	upgrader websocket.Upgrader         // for upgrading HTTP requests to websockets
 }
 
 // Event is something that happens in the game, like a player moving.
@@ -27,7 +27,7 @@ type Event struct {
 func New(port int) *Server {
 	return &Server{
 		addr:    fmt.Sprintf(":%d", port),
-		players: make(map[*websocket.Conn]bool),
+		players: make(map[string]*websocket.Conn),
 	}
 }
 
@@ -46,6 +46,8 @@ func (s *Server) Start() error {
 }
 
 func (s *Server) handleConnection(w http.ResponseWriter, r *http.Request) {
+	name := r.URL.Query().Get("name")
+
 	// Upgrade initial GET request to a websocket.
 	ws, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -55,7 +57,8 @@ func (s *Server) handleConnection(w http.ResponseWriter, r *http.Request) {
 	defer ws.Close()
 
 	// Register the new player.
-	s.players[ws] = true
+	log.Printf("%s joined.", name)
+	s.players[name] = ws
 
 	// Display "@" character at top left of screen.
 	if err := ws.WriteJSON(Event{
@@ -63,7 +66,8 @@ func (s *Server) handleConnection(w http.ResponseWriter, r *http.Request) {
 		Data: `{"c": "@", "x": 0, "y": 0}`,
 	}); err != nil {
 		log.Print("Warning: ", err)
-		delete(s.players, ws)
+		log.Printf("%s left.", name)
+		delete(s.players, name)
 		return
 	}
 
@@ -72,7 +76,8 @@ func (s *Server) handleConnection(w http.ResponseWriter, r *http.Request) {
 		// Wait for a new event to come in and parse it.
 		if err := ws.ReadJSON(&e); err != nil {
 			log.Print("Warning: ", err)
-			delete(s.players, ws)
+			log.Printf("%s left.", name)
+			delete(s.players, name)
 			break
 		}
 		// Just print the event for now.

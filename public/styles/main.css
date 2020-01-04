@@ -1,13 +1,30 @@
 body {
-  font-family: monospace;
+  font-family: 'Roboto Mono', monospace;
   color: #d0d0d0;
   background-color: #202020;
+  text-align: center;
+}
+
+input[type=text] {
+  font-family: 'Roboto Mono', monospace;
+  color: #d0d0d0;
+  background-color: #202020;
+  border: none;
+  border-bottom: 1px solid #d0d0d0;
+}
+
+input[type=text]:focus {
+  outline: none;
+}
+
+.panel {
+  width: 550px;
+  margin: 40px auto;
 }
 
 #screen {
   border: 1px solid #d0d0d0;
-  font-family: 'Courier New', Courier, monospace;
   margin: 50px auto;
-  padding: 5px 7px 7px 7px;
+  padding: 5px 7px 9px 7px;
   width: fit-content;
 }

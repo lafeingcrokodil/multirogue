@@ -2,20 +2,9 @@ let MultiRogue = new Vue({
   el: '#multirogue',
 
   data: {
+    joined: false, // true if we have joined the game
+    name: null, // name of our adventurer
     rows: [] // rows of characters displayed on the screen
-  },
-
-  created: function() {
-    for (let y = 0; y < 24; y++) {
-      let row = [];
-      for (let x = 0; x < 80; x++) {
-        row.push('.');
-      }
-      this.rows.push(row);
-    }
-    
-    this.ws = new WebSocket('ws://' + window.location.host + '/ws');
-    this.ws.addEventListener('message', this.handleEvent.bind(this));
   },
 
   methods: {
@@ -38,6 +27,28 @@ let MultiRogue = new Vue({
         name: name,
         data: JSON.stringify(data)
       }));
+    },
+
+    join: function() {
+      if (!this.name) {
+        alert('Please enter a name between 1 and 16 characters.');
+        return;
+      }
+
+      // connect to server
+      this.ws = new WebSocket('ws://' + window.location.host + '/ws?name=' + this.name);
+      this.ws.addEventListener('message', this.handleEvent.bind(this));
+
+      // load the dungeon level
+      for (let y = 0; y < 24; y++) {
+        let row = [];
+        for (let x = 0; x < 80; x++) {
+          row.push('.');
+        }
+        this.rows.push(row);
+      }
+
+      this.joined = true;
     }
   }
 });

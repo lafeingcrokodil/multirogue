@@ -9,12 +9,20 @@
 
   <title>MultiRogue</title>
 
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto+Mono&display=swap">
   <link rel="stylesheet" href="/styles/main.css">
 </head>
 
 <body>
   <main id="multirogue">
-    <p id="screen">
+    <div class="panel" v-if="!joined">
+      <h2>Welcome, Adventurer!</h2>
+      <p>Are you ready to enter the Dungeons of Doom? If so, please write your name below and press ENTER.</p>
+      <input type="text" id="name" maxlength="16" minlength="1" placeholder="Name" size="16" spellcheck="false"
+        title="Please enter a name between 1 and 16 characters."
+        v-model="name" @keyup.enter="join">
+    </div>
+    <p id="screen" v-if="joined">
       <span v-for="row of rows">
         <span v-for="c of row">{{ c }}</span><br/>
       </span>
