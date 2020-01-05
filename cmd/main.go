@@ -20,6 +20,6 @@ func main() {
 
 	s := server.New(port)
 	if err := s.Start(); err != nil {
-		log.Fatal("Error: ", err)
+		log.Fatal(err)
 	}
 }

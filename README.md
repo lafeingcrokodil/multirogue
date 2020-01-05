@@ -15,4 +15,5 @@ You should then be able to access the app at [localhost:8080](localhost:8080).
 
 ## Sources
 
-- [Build a Realtime Chat Server With Go and WebSockets](https://scotch.io/bar-talk/build-a-realtime-chat-server-with-go-and-websockets) - I used this tutorial as a starting point for the app.
+- [Build a Realtime Chat Server With Go and WebSockets](https://scotch.io/bar-talk/build-a-realtime-chat-server-with-go-and-websockets)
+- [Chat Example from gorilla/websocket](https://github.com/gorilla/websocket/tree/master/examples/chat)

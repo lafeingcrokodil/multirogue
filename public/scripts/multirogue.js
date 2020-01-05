@@ -14,11 +14,35 @@ let MultiRogue = new Vue({
       Vue.set(this.rows, y, row);
     },
 
+    displayLevel: function({map}) {
+      let rows = [];
+      let row = [];
+      let c;
+      for (let i = 0; i < map.length; i++) {
+        c = map.charAt(i);
+        if (c === '\n') {
+          rows.push(row);
+          row = [];
+        } else {
+          row.push(c);
+        }
+      }
+      this.rows = rows;
+    },
+
     handleEvent: function(e) {
-      let event = JSON.parse(e.data);
-      switch (event.name) {
-        case 'display':
-          this.display(JSON.parse(event.data));
+      let events = JSON.parse(e.data);
+      for (event of events) {
+        switch (event.name) {
+          case 'display':
+            this.display(JSON.parse(event.data));
+            break;
+          case 'level':
+            this.displayLevel(JSON.parse(event.data));
+            break;
+          default:
+            console.error('unknown event:', event.name);
+        }
       }
     },
 
@@ -38,15 +62,6 @@ let MultiRogue = new Vue({
       // connect to server
       this.ws = new WebSocket('ws://' + window.location.host + '/ws?name=' + this.name);
       this.ws.addEventListener('message', this.handleEvent.bind(this));
-
-      // load the dungeon level
-      for (let y = 0; y < 24; y++) {
-        let row = [];
-        for (let x = 0; x < 80; x++) {
-          row.push('.');
-        }
-        this.rows.push(row);
-      }
 
       this.joined = true;
     }

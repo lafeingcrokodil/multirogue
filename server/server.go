@@ -1,5 +1,9 @@
 package server
 
+// Sources:
+// https://github.com/gorilla/websocket/tree/master/examples/chat
+// https://scotch.io/bar-talk/build-a-realtime-chat-server-with-go-and-websockets
+
 import (
 	"fmt"
 	"log"
@@ -7,13 +11,6 @@ import (
 
 	"github.com/gorilla/websocket"
 )
-
-// Server is a MultiRogue server.
-type Server struct {
-	addr     string                     // TCP address to listen on
-	players  map[string]*websocket.Conn // players that are currently connected
-	upgrader websocket.Upgrader         // for upgrading HTTP requests to websockets
-}
 
 // Event is something that happens in the game, like a player moving.
 type Event struct {
@@ -23,16 +20,25 @@ type Event struct {
 	Data string `json:"data"`
 }
 
+// Server is a MultiRogue server.
+type Server struct {
+	addr     string // TCP address to listen on
+	hub      *Hub
+	upgrader websocket.Upgrader
+}
+
 // New returns a new Server instance.
 func New(port int) *Server {
 	return &Server{
-		addr:    fmt.Sprintf(":%d", port),
-		players: make(map[string]*websocket.Conn),
+		addr: fmt.Sprintf(":%d", port),
+		hub:  newHub(),
 	}
 }
 
 // Start starts the server.
 func (s *Server) Start() error {
+	go s.hub.run()
+
 	// Serve static assets.
 	fs := http.FileServer(http.Dir("./public"))
 	http.Handle("/", fs)
@@ -41,46 +47,30 @@ func (s *Server) Start() error {
 	http.HandleFunc("/ws", s.handleConnection)
 
 	// Start listening for incoming requests.
-	log.Printf("Starting server on %s...\n", s.addr)
+	log.Printf("INFO: Starting server on %s...\n", s.addr)
 	return http.ListenAndServe(s.addr, nil)
 }
 
 func (s *Server) handleConnection(w http.ResponseWriter, r *http.Request) {
-	name := r.URL.Query().Get("name")
+	log.Print("INFO: Incoming connection.")
 
-	// Upgrade initial GET request to a websocket.
-	ws, err := s.upgrader.Upgrade(w, r, nil)
+	// Upgrade initial HTTP server connection to the WebSocket protocol.
+	conn, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Print("Warning: ", err)
-		return
-	}
-	defer ws.Close()
-
-	// Register the new player.
-	log.Printf("%s joined.", name)
-	s.players[name] = ws
-
-	// Display "@" character at top left of screen.
-	if err := ws.WriteJSON(Event{
-		Name: "display",
-		Data: `{"c": "@", "x": 0, "y": 0}`,
-	}); err != nil {
-		log.Print("Warning: ", err)
-		log.Printf("%s left.", name)
-		delete(s.players, name)
+		log.Print("ERROR:", err)
 		return
 	}
 
-	for {
-		var e Event
-		// Wait for a new event to come in and parse it.
-		if err := ws.ReadJSON(&e); err != nil {
-			log.Print("Warning: ", err)
-			log.Printf("%s left.", name)
-			delete(s.players, name)
-			break
-		}
-		// Just print the event for now.
-		log.Print(e)
+	c := &Client{
+		name: r.URL.Query().Get("name"),
+		hub:  s.hub,
+		conn: conn,
+		send: make(chan *Event, 256),
 	}
+	c.hub.register <- c
+
+	// Allow collection of memory referenced by the caller by doing all work in
+	// new goroutines.
+	go c.writePump()
+	go c.readPump()
 }
