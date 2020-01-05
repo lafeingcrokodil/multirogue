@@ -6,14 +6,16 @@ import (
 	"log"
 
 	"github.com/gorilla/websocket"
+	"github.com/lafeingcrokodil/multirogue/creature"
+	"github.com/lafeingcrokodil/multirogue/event"
 )
 
 // Client is a middleman between the websocket connection and the hub.
 type Client struct {
-	name string // name chosen by the player
-	hub  *Hub
-	conn *websocket.Conn
-	send chan *Event // buffered channel of outbound events
+	rogue *creature.Rogue
+	hub   *Hub
+	conn  *websocket.Conn
+	send  chan *event.Event // buffered channel of outbound events
 }
 
 // readPump pumps messages from the websocket connection to the hub.
@@ -27,15 +29,15 @@ func (c *Client) readPump() {
 		c.conn.Close()
 	}()
 	for {
-		var e Event
+		var e event.Event
 		if err := c.conn.ReadJSON(&e); err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Print("ERROR:", err)
 			}
 			break
 		}
-		// Just broadcast incoming events to all clients for now.
-		c.hub.broadcast <- &e
+		// Just log incoming events for now.
+		log.Printf("INFO: Received %s event from %s.\n", e.Name, c.rogue.Name)
 	}
 }
 
@@ -47,7 +49,7 @@ func (c *Client) readPump() {
 func (c *Client) writePump() {
 	defer c.conn.Close()
 	for e := range c.send {
-		es := []*Event{e}
+		es := []*event.Event{e}
 
 		// Collect all queued events.
 		for i := 0; i < len(c.send); i++ {

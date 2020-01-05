@@ -7,12 +7,16 @@ const (
 
 // Tile contains information about a specific position in a dungeon.
 type Tile struct {
-	x       int
-	y       int
-	terrain rune
+	x        int
+	y        int
+	terrain  rune
+	occupant Creature
 }
 
 // Rune returns the rune representing the visible contents of a tile.
 func (t *Tile) Rune() rune {
+	if t.occupant != nil {
+		return t.occupant.Rune()
+	}
 	return t.terrain
 }

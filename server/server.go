@@ -10,15 +10,9 @@ import (
 	"net/http"
 
 	"github.com/gorilla/websocket"
+	"github.com/lafeingcrokodil/multirogue/creature"
+	"github.com/lafeingcrokodil/multirogue/event"
 )
-
-// Event is something that happens in the game, like a player moving.
-type Event struct {
-	// Name is the name of the event, e.g. "move".
-	Name string `json:"name"`
-	// Data contains additional information like the direction of movement.
-	Data string `json:"data"`
-}
 
 // Server is a MultiRogue server.
 type Server struct {
@@ -52,8 +46,6 @@ func (s *Server) Start() error {
 }
 
 func (s *Server) handleConnection(w http.ResponseWriter, r *http.Request) {
-	log.Print("INFO: Incoming connection.")
-
 	// Upgrade initial HTTP server connection to the WebSocket protocol.
 	conn, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -62,10 +54,10 @@ func (s *Server) handleConnection(w http.ResponseWriter, r *http.Request) {
 	}
 
 	c := &Client{
-		name: r.URL.Query().Get("name"),
-		hub:  s.hub,
-		conn: conn,
-		send: make(chan *Event, 256),
+		rogue: creature.NewRogue(r.URL.Query().Get("name")),
+		hub:   s.hub,
+		conn:  conn,
+		send:  make(chan *event.Event, 256),
 	}
 	c.hub.register <- c
 
