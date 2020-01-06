@@ -49,7 +49,7 @@ func (s *Server) handleConnection(w http.ResponseWriter, r *http.Request) {
 	// Upgrade initial HTTP server connection to the WebSocket protocol.
 	conn, err := s.upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		log.Print("ERROR:", err)
+		log.Print("ERROR:", err.Error())
 		return
 	}
 

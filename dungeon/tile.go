@@ -20,3 +20,8 @@ func (t *Tile) Rune() rune {
 	}
 	return t.terrain
 }
+
+// String returns the string representing the visible contents of a tile.
+func (t *Tile) String() string {
+	return string(t.Rune())
+}

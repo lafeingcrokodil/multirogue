@@ -10,6 +10,13 @@ import (
 	"github.com/lafeingcrokodil/multirogue/event"
 )
 
+// ClientEvent is an event fired by a client.
+type ClientEvent struct {
+	event.Event
+	// Source is the client that fired the event.
+	Source *Client
+}
+
 // Client is a middleman between the websocket connection and the hub.
 type Client struct {
 	rogue *creature.Rogue
@@ -32,12 +39,16 @@ func (c *Client) readPump() {
 		var e event.Event
 		if err := c.conn.ReadJSON(&e); err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
-				log.Print("ERROR:", err)
+				log.Print("ERROR:", err.Error())
 			}
 			break
 		}
-		// Just log incoming events for now.
-		log.Printf("INFO: Received %s event from %s.\n", e.Name, c.rogue.Name)
+		switch e.Name {
+		case "move":
+			c.hub.move <- &ClientEvent{Event: e, Source: c}
+		default:
+			log.Printf("ERROR: unknown event %s\n", e.Name)
+		}
 	}
 }
 

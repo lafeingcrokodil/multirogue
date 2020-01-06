@@ -64,6 +64,62 @@ let MultiRogue = new Vue({
       this.ws.addEventListener('message', this.handleEvent.bind(this));
 
       this.joined = true;
+
+      document.addEventListener('keydown', this.handleKeydown.bind(this));
+    },
+
+    handleKeydown: function(event) {
+      switch (event.key) {
+        case 'ArrowLeft':
+        case 'h':
+        case '4':
+          this.fireEvent('move', {dx: -1, dy: 0});
+          break;
+        case 'ArrowRight':
+        case 'l':
+        case '6':
+          this.fireEvent('move', {dx: 1, dy: 0});
+          break;
+        case 'ArrowUp':
+        case 'k':
+        case '8':
+          this.fireEvent('move', {dx: 0, dy: -1});
+          break;
+        case 'ArrowDown':
+        case 'j':
+        case '2':
+          this.fireEvent('move', {dx: 0, dy: 1});
+          break;
+        case 'Home':
+        case 'y':
+        case '7':
+          this.fireEvent('move', {dx: -1, dy: -1});
+          break;
+        case 'PageUp':
+        case 'u':
+        case '9':
+          this.fireEvent('move', {dx: 1, dy: -1});
+          break;
+        case 'End':
+        case 'b':
+        case '1':
+          this.fireEvent('move', {dx: -1, dy: 1});
+          break;
+        case 'PageDown':
+        case 'n':
+        case '3':
+          this.fireEvent('move', {dx: 1, dy: 1});
+          break;
+        case 'Clear':
+        case '.':
+        case '5':
+          this.fireEvent('move', {dx: 0, dy: 0});
+          break;
+        default:
+          console.error('unsupported key press:', event.key);
+          return; // don't prevent default for unrecognized keys
+      }
+      event.preventDefault();
     }
   }
 });

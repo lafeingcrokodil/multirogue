@@ -3,6 +3,7 @@ package server
 // Adapted from https://github.com/gorilla/websocket/tree/master/examples/chat
 
 import (
+	"encoding/json"
 	"log"
 
 	"github.com/lafeingcrokodil/multirogue/dungeon"
@@ -12,9 +13,10 @@ import (
 // Hub maintains the set of active clients.
 type Hub struct {
 	dungeon    *dungeon.Dungeon
-	clients    map[*Client]bool // registered clients
-	register   chan *Client     // register requests from clients
-	unregister chan *Client     // unregister requests from clients
+	clients    map[*Client]bool  // registered clients
+	register   chan *Client      // register requests from clients
+	unregister chan *Client      // unregister requests from clients
+	move       chan *ClientEvent // incoming move events from clients
 }
 
 func newHub() *Hub {
@@ -23,6 +25,7 @@ func newHub() *Hub {
 		register:   make(chan *Client),
 		unregister: make(chan *Client),
 		clients:    make(map[*Client]bool),
+		move:       make(chan *ClientEvent),
 	}
 }
 
@@ -42,6 +45,14 @@ func (h *Hub) run() {
 			}
 			send, broadcast := h.dungeon.Remove(c.rogue)
 			h.handleEvents(c, send, broadcast)
+		case e := <-h.move:
+			var d event.MoveData
+			if err := json.Unmarshal([]byte(e.Event.Data), &d); err != nil {
+				log.Print("ERROR:", err.Error())
+				continue
+			}
+			send, broadcast := h.dungeon.Move(e.Source.rogue, d)
+			h.handleEvents(e.Source, send, broadcast)
 		}
 	}
 }
