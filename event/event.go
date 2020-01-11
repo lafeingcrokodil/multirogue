@@ -53,3 +53,25 @@ type MoveData struct {
 	// DY is the change in position along the y axis.
 	DY int `json:"dy"`
 }
+
+// StatsData describe a rogue's current status.
+type StatsData struct {
+	// MapLevel is how deep the rogue has gone in the dungeon.
+	MapLevel int `json:"mapLvl"`
+	// Gold is the number of gold pieces that the rogue has found and kept so far.
+	Gold int `json:"gold"`
+	// HealthPoints is the rogue's current number of health points.
+	HealthPoints int `json:"hp"`
+	// MaxHealthPoints is the rogue's number of health points when fully healed.
+	MaxHealthPoints int `json:"maxHP"`
+	// Strength is the rogue's current strength.
+	Strength int `json:"str"`
+	// MaxStrength is the maximum strength that the rogue has attained so far.
+	MaxStrength int `json:"maxStr"`
+	// ArmourClass is the class of the armour that the rogue is currently wearing.
+	ArmourClass int `json:"arm"`
+	// ExperienceLevel is the rogue's current experience level.
+	ExperienceLevel int `json:"lvl"`
+	// Experience is the number of experience points that the rogue has gained so far.
+	Experience int `json:"exp"`
+}

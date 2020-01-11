@@ -47,6 +47,17 @@ func (d *Dungeon) Add(r *creature.Rogue) (send, broadcast []*event.Event) {
 			event.NewEvent(nil, "level", event.LevelData{
 				Map: d.Map(r),
 			}),
+			event.NewEvent(nil, "stats", event.StatsData{
+				MapLevel:        r.Pos.Level + 1,
+				Gold:            r.Gold,
+				HealthPoints:    r.HealthPoints,
+				MaxHealthPoints: r.MaxHealthPoints,
+				Strength:        r.Strength,
+				MaxStrength:     r.MaxStrength,
+				ArmourClass:     4, // TODO: derive armour class from currently-worn armour
+				ExperienceLevel: r.ExperienceLevel,
+				Experience:      r.Experience,
+			}),
 		}, []*event.Event{
 			event.NewEvent(&r.Pos.Level, "display", event.DisplayData{
 				X:    r.Pos.X,

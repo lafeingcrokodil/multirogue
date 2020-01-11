@@ -4,7 +4,8 @@ let MultiRogue = new Vue({
   data: {
     joined: false, // true if we have joined the game
     name: null, // name of our adventurer
-    map: [] // lines of characters displayed on the screen
+    map: [], // lines of characters displayed on the screen
+    stats: [] // player stats to be displayed below the map
   },
 
   methods: {
@@ -30,6 +31,27 @@ let MultiRogue = new Vue({
       this.map = newMap;
     },
 
+    displayStats: function({mapLvl, gold, hp, maxHP, str, maxStr, arm, lvl, exp}) {
+      // Construct stat string.
+      let statStr = '';
+      statStr += 'Lvl: ' + toPaddedString(mapLvl, 4);
+      statStr += 'Gold: ' + toPaddedString(gold, 8);
+      statStr += 'Hp: ' + toPaddedString(`${hp}(${maxHP})`, 10);
+      statStr += 'Str: ' + toPaddedString(`${str}(${maxStr})`, 8);
+      statStr += 'Arm: ' + toPaddedString(arm, 4);
+      statStr += `Exp: ${lvl}/${exp}`;
+      statStr = toPaddedString(statStr, 80);
+
+      // Convert string into array of characters.
+      let stats = [];
+      for (let i = 0; i < statStr.length; i++) {
+        stats.push(statStr.charAt(i));
+      }
+
+      // Publish updated stats.
+      this.stats = stats;
+    },
+
     handleEvent: function(e) {
       let events = JSON.parse(e.data);
       for (event of events) {
@@ -39,6 +61,9 @@ let MultiRogue = new Vue({
             break;
           case 'level':
             this.displayLevel(JSON.parse(event.data));
+            break;
+          case 'stats':
+            this.displayStats(JSON.parse(event.data));
             break;
           default:
             console.error('unknown event:', event.name);
@@ -123,3 +148,14 @@ let MultiRogue = new Vue({
     }
   }
 });
+
+// Pads the string representation of a value to the desired length
+// by adding spaces to the end of it.
+function toPaddedString(value, len) {
+  let str = `${value}`;
+  let currLen = str.length;
+  for (let i = 0; i < len - currLen; i++) {
+    str += '\u00A0'; // non-breaking space (more importantly, non-collapsing)
+  }
+  return str
+}
