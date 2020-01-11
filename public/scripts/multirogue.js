@@ -40,7 +40,7 @@ let MultiRogue = new Vue({
       statStr += 'Str: ' + toPaddedString(`${str}(${maxStr})`, 8);
       statStr += 'Arm: ' + toPaddedString(arm, 4);
       statStr += `Exp: ${lvl}/${exp}`;
-      statStr = toPaddedString(statStr, 80);
+      statStr = toPaddedString(statStr, this.map[0].length);
 
       // Convert string into array of characters.
       let stats = [];
@@ -139,6 +139,9 @@ let MultiRogue = new Vue({
         case '.':
         case '5':
           this.fireEvent('move', {dx: 0, dy: 0});
+          break;
+        case '>':
+          this.fireEvent('move', {dlvl: 1});
           break;
         default:
           console.error('unsupported key press:', event.key);

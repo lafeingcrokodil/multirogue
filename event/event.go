@@ -48,6 +48,8 @@ type LevelData struct {
 
 // MoveData is information related to a "move" event.
 type MoveData struct {
+	// DLevel is the change in dungeon level.
+	DLevel int `json:"dlvl"`
 	// DX is the change in position along the x axis.
 	DX int `json:"dx"`
 	// DY is the change in position along the y axis.

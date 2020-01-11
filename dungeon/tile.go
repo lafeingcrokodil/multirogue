@@ -3,6 +3,8 @@ package dungeon
 const (
 	// Floor is the floor of a room.
 	Floor = '.'
+	// Staircase leads to adjacent dungeon levels.
+	Staircase = '%'
 )
 
 // Tile contains information about a specific position in a dungeon.

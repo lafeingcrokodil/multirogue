@@ -27,43 +27,21 @@ type Dungeon struct {
 // New just generates a dungeon with one blank level for now.
 func New() *Dungeon {
 	rand.Seed(time.Now().UnixNano())
-	var ts [][]Tile
-	for y := 0; y < 24; y++ {
-		var t []Tile
-		for x := 0; x < 80; x++ {
-			t = append(t, Tile{x: x, y: y, terrain: Floor})
-		}
-		ts = append(ts, t)
+	var tiles [][][]Tile
+	for level := 0; level < 21; level++ {
+		tiles = append(tiles, NewLevel())
 	}
-	return &Dungeon{
-		tiles: [][][]Tile{ts},
-	}
+	return &Dungeon{tiles: tiles}
 }
 
 // Add places a rogue in a dungeon.
 func (d *Dungeon) Add(r *creature.Rogue) (send, broadcast []*event.Event) {
 	d.occupy(r, d.randomSpawnPos(0))
 	return []*event.Event{
-			event.NewEvent(nil, "level", event.LevelData{
-				Map: d.Map(r),
-			}),
-			event.NewEvent(nil, "stats", event.StatsData{
-				MapLevel:        r.Pos.Level + 1,
-				Gold:            r.Gold,
-				HealthPoints:    r.HealthPoints,
-				MaxHealthPoints: r.MaxHealthPoints,
-				Strength:        r.Strength,
-				MaxStrength:     r.MaxStrength,
-				ArmourClass:     4, // TODO: derive armour class from currently-worn armour
-				ExperienceLevel: r.ExperienceLevel,
-				Experience:      r.Experience,
-			}),
+			d.newLevelEvent(r),
+			d.newStatsEvent(r),
 		}, []*event.Event{
-			event.NewEvent(&r.Pos.Level, "display", event.DisplayData{
-				X:    r.Pos.X,
-				Y:    r.Pos.Y,
-				Char: d.tiles[r.Pos.Level][r.Pos.Y][r.Pos.X].String(),
-			}),
+			d.newDisplayEvent(r.Pos),
 		}
 }
 
@@ -71,19 +49,25 @@ func (d *Dungeon) Add(r *creature.Rogue) (send, broadcast []*event.Event) {
 func (d *Dungeon) Remove(r *creature.Rogue) (send, broadcast []*event.Event) {
 	d.unoccupy(r)
 	return nil, []*event.Event{
-		event.NewEvent(&r.Pos.Level, "display", event.DisplayData{
-			X:    r.Pos.X,
-			Y:    r.Pos.Y,
-			Char: d.tiles[r.Pos.Level][r.Pos.Y][r.Pos.X].String(),
-		}),
+		d.newDisplayEvent(r.Pos),
 	}
 }
 
 // Move moves a rogue from one position to another.
 func (d *Dungeon) Move(r *creature.Rogue, data event.MoveData) (send, broadcast []*event.Event) {
+	// Ascending or descending is only possible via staircases.
+	if data.DLevel != 0 && d.tiles[r.Pos.Level][r.Pos.Y][r.Pos.X].terrain != Staircase {
+		return nil, nil
+	}
+
+	// Ascending is only possible once the rogue has the Amulet of Yendor.
+	if data.DLevel < 0 { // TODO: check if rogue has amulet
+		return nil, nil
+	}
+
 	originalPos := r.Pos
 	newPos := &creature.Position{
-		Level: r.Pos.Level,
+		Level: r.Pos.Level + data.DLevel,
 		X:     r.Pos.X + data.DX,
 		Y:     r.Pos.Y + data.DY,
 	}
@@ -95,16 +79,16 @@ func (d *Dungeon) Move(r *creature.Rogue, data event.MoveData) (send, broadcast 
 	d.unoccupy(r)
 	d.occupy(r, newPos)
 
-	return nil, []*event.Event{
-		event.NewEvent(&r.Pos.Level, "display", event.DisplayData{
-			X:    originalPos.X,
-			Y:    originalPos.Y,
-			Char: d.tiles[originalPos.Level][originalPos.Y][originalPos.X].String(),
-		}), event.NewEvent(&r.Pos.Level, "display", event.DisplayData{
-			X:    r.Pos.X,
-			Y:    r.Pos.Y,
-			Char: d.tiles[r.Pos.Level][r.Pos.Y][r.Pos.X].String(),
-		}),
+	if newPos.Level != originalPos.Level {
+		send = []*event.Event{
+			d.newLevelEvent(r),
+			d.newStatsEvent(r),
+		}
+	}
+
+	return send, []*event.Event{
+		d.newDisplayEvent(originalPos),
+		d.newDisplayEvent(r.Pos),
 	}
 }
 
@@ -118,6 +102,34 @@ func (d *Dungeon) Map(r *creature.Rogue) string {
 		m += "\n"
 	}
 	return m
+}
+
+func (d *Dungeon) newDisplayEvent(pos *creature.Position) *event.Event {
+	return event.NewEvent(&pos.Level, "display", event.DisplayData{
+		X:    pos.X,
+		Y:    pos.Y,
+		Char: d.tiles[pos.Level][pos.Y][pos.X].String(),
+	})
+}
+
+func (d *Dungeon) newLevelEvent(r *creature.Rogue) *event.Event {
+	return event.NewEvent(nil, "level", event.LevelData{
+		Map: d.Map(r),
+	})
+}
+
+func (d *Dungeon) newStatsEvent(r *creature.Rogue) *event.Event {
+	return event.NewEvent(nil, "stats", event.StatsData{
+		MapLevel:        r.Pos.Level + 1,
+		Gold:            r.Gold,
+		HealthPoints:    r.HealthPoints,
+		MaxHealthPoints: r.MaxHealthPoints,
+		Strength:        r.Strength,
+		MaxStrength:     r.MaxStrength,
+		ArmourClass:     4, // TODO: derive armour class from currently-worn armour
+		ExperienceLevel: r.ExperienceLevel,
+		Experience:      r.Experience,
+	})
 }
 
 func (d *Dungeon) occupy(c Creature, pos *creature.Position) {
@@ -158,5 +170,6 @@ func (d *Dungeon) isValid(pos *creature.Position) bool {
 	if pos.X < 0 || pos.X >= len(d.tiles[pos.Level][pos.Y]) { // invalid x position
 		return false
 	}
-	return d.tiles[pos.Level][pos.Y][pos.X].Rune() == Floor
+	tile := d.tiles[pos.Level][pos.Y][pos.X].Rune()
+	return tile == Floor || tile == Staircase
 }
