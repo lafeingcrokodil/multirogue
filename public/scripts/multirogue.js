@@ -4,30 +4,30 @@ let MultiRogue = new Vue({
   data: {
     joined: false, // true if we have joined the game
     name: null, // name of our adventurer
-    rows: [] // rows of characters displayed on the screen
+    map: [] // lines of characters displayed on the screen
   },
 
   methods: {
     display: function({c, x, y}) {
-      let row = this.rows[y]; // in the yth row...
-      row.splice(x, 1, c); // replace the xth character with c
-      Vue.set(this.rows, y, row);
+      let line = this.map[y]; // in the yth line...
+      line.splice(x, 1, c); // replace the xth character with c
+      Vue.set(this.map, y, line);
     },
 
     displayLevel: function({map}) {
-      let rows = [];
-      let row = [];
+      let newMap = [];
+      let line = [];
       let c;
       for (let i = 0; i < map.length; i++) {
         c = map.charAt(i);
         if (c === '\n') {
-          rows.push(row);
-          row = [];
+          newMap.push(line);
+          line = [];
         } else {
-          row.push(c);
+          line.push(c);
         }
       }
-      this.rows = rows;
+      this.map = newMap;
     },
 
     handleEvent: function(e) {

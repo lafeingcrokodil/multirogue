@@ -23,8 +23,8 @@
         v-model="name" @keyup.enter="join">
     </div>
     <p id="screen" v-if="joined">
-      <span v-for="row of rows">
-        <span v-for="c of row">{{ c }}</span><br/>
+      <span v-for="line of map">
+        <span v-for="c of line">{{ c }}</span><br/>
       </span>
     </p>
   </main>
