@@ -1,11 +1,17 @@
 package dungeon
 
 import (
+	"fmt"
 	"math/rand"
-	"time"
 
 	"github.com/lafeingcrokodil/multirogue/creature"
 	"github.com/lafeingcrokodil/multirogue/event"
+)
+
+const (
+	MaxLevel = 21
+	MaxX     = 80
+	MaxY     = 24
 )
 
 // Creature is a living occupant of the dungeons.
@@ -21,15 +27,23 @@ type Creature interface {
 // Dungeon is a randomly generated set of rooms, passages, monsters and
 // items spread over multiple levels.
 type Dungeon struct {
-	tiles [][][]Tile
+	tiles [][][]*Tile
 }
 
 // New just generates a dungeon with one blank level for now.
 func New() *Dungeon {
-	rand.Seed(time.Now().UnixNano())
-	var tiles [][][]Tile
-	for level := 0; level < 21; level++ {
-		tiles = append(tiles, NewLevel())
+	g := NewGenerator()
+	var tiles [][][]*Tile
+	for level := 0; level < MaxLevel; level++ {
+		tiles = append(tiles, g.NewLevel())
+		var m string
+		for y := 0; y < len(tiles[level]); y++ {
+			for x := 0; x < len(tiles[level][y]); x++ {
+				m += tiles[level][y][x].String()
+			}
+			m += "\n"
+		}
+		fmt.Println(m)
 	}
 	return &Dungeon{tiles: tiles}
 }
