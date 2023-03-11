@@ -3,13 +3,15 @@ Multirogue
 
 A multiplayer version of Rogue.
 
-## Installation
+## Getting started
 
 Start the server by running
 
-    go run cmd/main.go
+    go run cmd/server/main.go
 
-You should then be able to access the app at [localhost:8080](localhost:8080).
+You should then be able to access the app at [localhost:8080](localhost:8080) or in a terminal by running
+
+    go run cmd/tui/main.go
 
 ## Sources
 
