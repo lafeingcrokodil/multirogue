@@ -2,23 +2,23 @@ package dungeon
 
 import "math/rand"
 
-const length = 80
-const breadth = 24
+const Lines = 24
+const Cols = 80
 
 func NewLevel() [][]Tile {
 	var ts [][]Tile
-	for y := 0; y < breadth; y++ {
+	for line := 0; line < Lines; line++ {
 		var t []Tile
-		for x := 0; x < length; x++ {
-			t = append(t, Tile{x: x, y: y, terrain: Floor})
+		for col := 0; col < Cols; col++ {
+			t = append(t, Tile{terrain: Floor})
 		}
 		ts = append(ts, t)
 	}
-	x, y := staircasePos()
-	ts[y][x].terrain = Staircase
+	line, col := staircasePos()
+	ts[line][col].terrain = Staircase
 	return ts
 }
 
-func staircasePos() (x, y int) {
-	return rand.Intn(length), rand.Intn(breadth)
+func staircasePos() (line, col int) {
+	return rand.Intn(Lines), rand.Intn(Cols)
 }

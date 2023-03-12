@@ -9,10 +9,10 @@ let MultiRogue = new Vue({
   },
 
   methods: {
-    display: function({c, x, y}) {
-      let line = this.map[y]; // in the yth line...
-      line.splice(x, 1, c); // replace the xth character with c
-      Vue.set(this.map, y, line);
+    display: function({c, line, col}) {
+      let l = this.map[line]; // in the relevant line...
+      l.splice(col, 1, c); // replace the character in the relevant column with c...
+      Vue.set(this.map, line, l); // and replace the line in Vue
     },
 
     displayLevel: function({map}) {
@@ -98,47 +98,47 @@ let MultiRogue = new Vue({
         case 'ArrowLeft':
         case 'h':
         case '4':
-          this.fireEvent('move', {dx: -1, dy: 0});
+          this.fireEvent('move', {dcol: -1});
           break;
         case 'ArrowRight':
         case 'l':
         case '6':
-          this.fireEvent('move', {dx: 1, dy: 0});
+          this.fireEvent('move', {dcol: 1});
           break;
         case 'ArrowUp':
         case 'k':
         case '8':
-          this.fireEvent('move', {dx: 0, dy: -1});
+          this.fireEvent('move', {dline: -1});
           break;
         case 'ArrowDown':
         case 'j':
         case '2':
-          this.fireEvent('move', {dx: 0, dy: 1});
+          this.fireEvent('move', {dline: 1});
           break;
         case 'Home':
         case 'y':
         case '7':
-          this.fireEvent('move', {dx: -1, dy: -1});
+          this.fireEvent('move', {dline: -1, dcol: -1});
           break;
         case 'PageUp':
         case 'u':
         case '9':
-          this.fireEvent('move', {dx: 1, dy: -1});
+          this.fireEvent('move', {dline: -1, dcol: 1});
           break;
         case 'End':
         case 'b':
         case '1':
-          this.fireEvent('move', {dx: -1, dy: 1});
+          this.fireEvent('move', {dline: 1, dcol: -1});
           break;
         case 'PageDown':
         case 'n':
         case '3':
-          this.fireEvent('move', {dx: 1, dy: 1});
+          this.fireEvent('move', {dline: 1, dcol: 1});
           break;
         case 'Clear':
         case '.':
         case '5':
-          this.fireEvent('move', {dx: 0, dy: 0});
+          this.fireEvent('move', {});
           break;
         case '>':
           this.fireEvent('move', {dlvl: 1});

@@ -10,11 +10,11 @@ import (
 
 // Creature is a living occupant of the dungeons.
 type Creature interface {
-	// Position returns the rogue's position in the dungeon.
+	// Position returns the creature's position in the dungeon.
 	Position() *creature.Position
-	// Rune returns the rune representing the rogue.
+	// Rune returns the rune representing the creature.
 	Rune() rune
-	// SetPosition sets the rogues position in the dungeon.
+	// SetPosition sets the creature's position in the dungeon.
 	SetPosition(pos *creature.Position)
 }
 
@@ -56,7 +56,7 @@ func (d *Dungeon) Remove(r *creature.Rogue) (send, broadcast []*event.Event) {
 // Move moves a rogue from one position to another.
 func (d *Dungeon) Move(r *creature.Rogue, data event.MoveData) (send, broadcast []*event.Event) {
 	// Ascending or descending is only possible via staircases.
-	if data.DLevel != 0 && d.tiles[r.Pos.Level][r.Pos.Y][r.Pos.X].terrain != Staircase {
+	if data.DLevel != 0 && d.tiles[r.Pos.Level][r.Pos.Line][r.Pos.Col].terrain != Staircase {
 		return nil, nil
 	}
 
@@ -68,8 +68,8 @@ func (d *Dungeon) Move(r *creature.Rogue, data event.MoveData) (send, broadcast 
 	originalPos := r.Pos
 	newPos := &creature.Position{
 		Level: r.Pos.Level + data.DLevel,
-		X:     r.Pos.X + data.DX,
-		Y:     r.Pos.Y + data.DY,
+		Line:  r.Pos.Line + data.DLine,
+		Col:   r.Pos.Col + data.DCol,
 	}
 
 	if !d.isValid(newPos) {
@@ -95,9 +95,9 @@ func (d *Dungeon) Move(r *creature.Rogue, data event.MoveData) (send, broadcast 
 // Map returns a string representation of the level.
 func (d *Dungeon) Map(r *creature.Rogue) string {
 	var m string
-	for y := 0; y < len(d.tiles[r.Pos.Level]); y++ {
-		for x := 0; x < len(d.tiles[r.Pos.Level][y]); x++ {
-			m += d.tiles[r.Pos.Level][y][x].String()
+	for line := 0; line < len(d.tiles[r.Pos.Level]); line++ {
+		for col := 0; col < len(d.tiles[r.Pos.Level][line]); col++ {
+			m += d.tiles[r.Pos.Level][line][col].String()
 		}
 		m += "\n"
 	}
@@ -106,9 +106,9 @@ func (d *Dungeon) Map(r *creature.Rogue) string {
 
 func (d *Dungeon) newDisplayEvent(pos *creature.Position) *event.Event {
 	return event.NewEvent(&pos.Level, "display", event.DisplayData{
-		X:    pos.X,
-		Y:    pos.Y,
-		Char: d.tiles[pos.Level][pos.Y][pos.X].String(),
+		Line: pos.Line,
+		Col:  pos.Col,
+		Char: d.tiles[pos.Level][pos.Line][pos.Col].String(),
 	})
 }
 
@@ -133,43 +133,43 @@ func (d *Dungeon) newStatsEvent(r *creature.Rogue) *event.Event {
 }
 
 func (d *Dungeon) occupy(c Creature, pos *creature.Position) {
-	d.tiles[pos.Level][pos.Y][pos.X].occupant = c
+	d.tiles[pos.Level][pos.Line][pos.Col].occupant = c
 	c.SetPosition(pos)
 }
 
 func (d *Dungeon) unoccupy(c Creature) {
 	pos := c.Position()
-	d.tiles[pos.Level][pos.Y][pos.X].occupant = nil
+	d.tiles[pos.Level][pos.Line][pos.Col].occupant = nil
 }
 
 func (d *Dungeon) randomSpawnPos(level int) *creature.Position {
 	for {
-		x := rand.Intn(len(d.tiles[level][0]))
-		y := rand.Intn(len(d.tiles[level]))
-		if d.isValidSpawnPos(level, x, y) {
+		line := rand.Intn(len(d.tiles[level]))
+		col := rand.Intn(len(d.tiles[level][0]))
+		if d.isValidSpawnPos(level, line, col) {
 			return &creature.Position{
 				Level: level,
-				X:     x,
-				Y:     y,
+				Line:  line,
+				Col:   col,
 			}
 		}
 	}
 }
 
-func (d *Dungeon) isValidSpawnPos(level, x, y int) bool {
-	return d.tiles[level][y][x].Rune() == Floor
+func (d *Dungeon) isValidSpawnPos(level, line, col int) bool {
+	return d.tiles[level][line][col].Rune() == Floor
 }
 
 func (d *Dungeon) isValid(pos *creature.Position) bool {
 	if pos.Level < 0 || pos.Level >= len(d.tiles) { // invalid level
 		return false
 	}
-	if pos.Y < 0 || pos.Y >= len(d.tiles[pos.Level]) { // invalid y position
+	if pos.Line < 0 || pos.Line >= len(d.tiles[pos.Level]) { // invalid y position
 		return false
 	}
-	if pos.X < 0 || pos.X >= len(d.tiles[pos.Level][pos.Y]) { // invalid x position
+	if pos.Col < 0 || pos.Col >= len(d.tiles[pos.Level][pos.Line]) { // invalid x position
 		return false
 	}
-	tile := d.tiles[pos.Level][pos.Y][pos.X].Rune()
+	tile := d.tiles[pos.Level][pos.Line][pos.Col].Rune()
 	return tile == Floor || tile == Staircase
 }

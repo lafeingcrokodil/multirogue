@@ -32,10 +32,10 @@ func NewEvent(level *int, name string, d interface{}) *Event {
 
 // DisplayData is information related to a "display" event.
 type DisplayData struct {
-	// X is the position on the x axis.
-	X int `json:"x"`
-	// Y is the position on the y axis.
-	Y int `json:"y"`
+	// Line is the position on the y axis.
+	Line int `json:"line"`
+	// Col is the position on the x axis.
+	Col int `json:"col"`
 	// Char is the character to be displayed.
 	Char string `json:"c"`
 }
@@ -50,10 +50,10 @@ type LevelData struct {
 type MoveData struct {
 	// DLevel is the change in dungeon level.
 	DLevel int `json:"dlvl"`
-	// DX is the change in position along the x axis.
-	DX int `json:"dx"`
-	// DY is the change in position along the y axis.
-	DY int `json:"dy"`
+	// DLine is the change in position along the y axis.
+	DLine int `json:"dline"`
+	// DCol is the change in position along the x axis.
+	DCol int `json:"dcol"`
 }
 
 // StatsData describe a rogue's current status.
