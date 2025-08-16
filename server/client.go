@@ -38,7 +38,8 @@ func (c *Client) readPump() {
 	}()
 	for {
 		var e event.Event
-		if err := c.conn.ReadJSON(&e); err != nil {
+		err := c.conn.ReadJSON(&e)
+		if err != nil {
 			if websocket.IsUnexpectedCloseError(err, websocket.CloseGoingAway, websocket.CloseAbnormalClosure) {
 				log.Print("ERROR:", err.Error())
 			}
@@ -68,7 +69,8 @@ func (c *Client) writePump() {
 			es = append(es, <-c.send)
 		}
 
-		if err := c.conn.WriteJSON(es); err != nil {
+		err := c.conn.WriteJSON(es)
+		if err != nil {
 			return
 		}
 	}

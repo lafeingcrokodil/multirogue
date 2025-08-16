@@ -19,7 +19,8 @@ func main() {
 	kingpin.Parse()
 
 	s := server.New(port)
-	if err := s.Start(); err != nil {
+	err := s.Start()
+	if err != nil {
 		log.Fatal(err)
 	}
 }
