@@ -1,5 +1,7 @@
 package creature
 
+import "github.com/lafeingcrokodil/multirogue/random"
+
 // Rogue is an adventurer in a dungeon.
 type Rogue struct {
 	*Creature
@@ -19,6 +21,7 @@ func NewRogue(name string) *Rogue {
 			symbol:          '@',
 			gold:            initialGold,
 			armourClass:     maxArmourClass,
+			damage:          []*random.Dice{{Count: 1, Sides: 4}}, //nolint:mnd
 			experience:      initialExperience,
 			experienceLevel: initialExperienceLevel,
 			hitPoints:       initialMaxHitPoints,
