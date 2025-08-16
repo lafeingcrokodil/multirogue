@@ -8,7 +8,7 @@ import (
 )
 
 // We set this value as part of the build process using `-ldflags "-X main.version=$VERSION"`.
-var version = "unknown" // nolint:gochecknoglobals
+var version = "unknown"
 
 func main() {
 	var port int
