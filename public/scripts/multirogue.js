@@ -31,12 +31,12 @@ let MultiRogue = new Vue({
       this.map = newMap;
     },
 
-    displayStats: function ({ mapLvl, gold, hp, maxHP, str, maxStr, arm, lvl, exp }) {
+    displayStats: function ({ mapLvl, gold, hp, maxHp, str, maxStr, arm, lvl, exp }) {
       // Construct stat string.
       let statStr = '';
       statStr += 'Lvl: ' + toPaddedString(mapLvl, 4);
       statStr += 'Gold: ' + toPaddedString(gold, 8);
-      statStr += 'Hp: ' + toPaddedString(`${hp}(${maxHP})`, 10);
+      statStr += 'Hp: ' + toPaddedString(`${hp}(${maxHp})`, 10);
       statStr += 'Str: ' + toPaddedString(`${str}(${maxStr})`, 8);
       statStr += 'Arm: ' + toPaddedString(arm, 4);
       statStr += `Exp: ${lvl}/${exp}`;

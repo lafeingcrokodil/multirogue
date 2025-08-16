@@ -66,7 +66,7 @@ type StatsData struct {
 	// HealthPoints is the rogue's current number of health points.
 	HealthPoints int `json:"hp"`
 	// MaxHealthPoints is the rogue's number of health points when fully healed.
-	MaxHealthPoints int `json:"maxHP"`
+	MaxHealthPoints int `json:"maxHp"`
 	// Strength is the rogue's current strength.
 	Strength int `json:"str"`
 	// MaxStrength is the maximum strength that the rogue has attained so far.
