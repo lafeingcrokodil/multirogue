@@ -7,7 +7,7 @@ build: ## Build the application.
 	@ mkdir -p bin
 	@ VERSION=$$(git describe --tag --always --dirty) && \
 		go build -o bin/multirogue -ldflags "-X main.version=$$VERSION" \
-		cmd/main.go
+		cmd/web/main.go
 
 lint: ## Run standard linters and a few additional explicitly enabled ones.
 	@ golangci-lint run
@@ -23,4 +23,4 @@ web-docker: ## Run the application in a local Docker container.
 	@ docker run --rm -p 8080:8080 multirogue
 
 web-dev: ## Run the application locally without using Docker.
-	@ go run cmd/main.go
+	@ go run cmd/web/main.go
