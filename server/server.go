@@ -9,10 +9,17 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/lafeingcrokodil/multirogue/creature"
 	"github.com/lafeingcrokodil/multirogue/event"
+)
+
+const (
+	readTimeout  = 5 * time.Second
+	writeTimeout = 10 * time.Second
+	idleTimeout  = 120 * time.Second
 )
 
 // Server is a MultiRogue server.
@@ -34,16 +41,26 @@ func New(port int) *Server {
 func (s *Server) Start() error {
 	go s.hub.run()
 
+	mux := http.NewServeMux()
+
 	// Serve static assets.
 	fs := http.FileServer(http.Dir("./public"))
-	http.Handle("/", fs)
+	mux.Handle("/", fs)
 
 	// Configure websocket route.
-	http.HandleFunc("/ws", s.handleConnection)
+	mux.HandleFunc("/ws", s.handleConnection)
+
+	srv := &http.Server{
+		Addr:         s.addr,
+		Handler:      mux,
+		ReadTimeout:  readTimeout,
+		WriteTimeout: writeTimeout,
+		IdleTimeout:  idleTimeout,
+	}
 
 	// Start listening for incoming requests.
 	log.Printf("INFO: Starting server on %s...\n", s.addr)
-	return http.ListenAndServe(s.addr, nil)
+	return srv.ListenAndServe()
 }
 
 func (s *Server) handleConnection(w http.ResponseWriter, r *http.Request) {
