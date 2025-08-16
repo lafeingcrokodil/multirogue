@@ -7,9 +7,9 @@ const breadth = 24
 
 // NewLevel randomly generates a new dungeon level.
 func NewLevel() [][]Tile {
-	var ts [][]Tile
+	ts := make([][]Tile, 0, breadth)
 	for y := range breadth {
-		var t []Tile
+		t := make([]Tile, 0, length)
 		for x := range length {
 			t = append(t, Tile{x: x, y: y, terrain: Floor})
 		}

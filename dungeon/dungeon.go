@@ -29,7 +29,7 @@ type Dungeon struct {
 
 // New just generates a dungeon with blank levels for now.
 func New() *Dungeon {
-	var tiles [][][]Tile
+	tiles := make([][][]Tile, 0, numLevels)
 	for range numLevels {
 		tiles = append(tiles, NewLevel())
 	}
