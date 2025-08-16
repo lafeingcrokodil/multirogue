@@ -55,8 +55,8 @@ func (r *Rogue) Position() *Position {
 	return r.Pos
 }
 
-// Rune returns the rune representing the rogue.
-func (r *Rogue) Rune() rune {
+// Symbol returns the rune representing the rogue.
+func (r *Rogue) Symbol() rune {
 	return '@'
 }
 

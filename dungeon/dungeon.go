@@ -15,8 +15,8 @@ const numLevels = 21
 type Creature interface {
 	// Position returns the creature's position in the dungeon.
 	Position() *creature.Position
-	// Rune returns the rune representing the creature.
-	Rune() rune
+	// Symbol returns the rune representing the creature.
+	Symbol() rune
 	// SetPosition sets the creature's position in the dungeon.
 	SetPosition(pos *creature.Position)
 }
@@ -159,7 +159,7 @@ func (d *Dungeon) randomSpawnPos(level int) *creature.Position {
 }
 
 func (d *Dungeon) isValidSpawnPos(level, x, y int) bool {
-	return d.tiles[level][y][x].Rune() == Floor
+	return d.tiles[level][y][x].Symbol() == Floor
 }
 
 func (d *Dungeon) isValid(pos *creature.Position) bool {
@@ -172,6 +172,6 @@ func (d *Dungeon) isValid(pos *creature.Position) bool {
 	if pos.X < 0 || pos.X >= len(d.tiles[pos.Level][pos.Y]) { // invalid x position
 		return false
 	}
-	tile := d.tiles[pos.Level][pos.Y][pos.X].Rune()
+	tile := d.tiles[pos.Level][pos.Y][pos.X].Symbol()
 	return tile == Floor || tile == Staircase
 }

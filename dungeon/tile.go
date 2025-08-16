@@ -15,15 +15,15 @@ type Tile struct {
 	occupant Creature
 }
 
-// Rune returns the rune representing the visible contents of a tile.
-func (t *Tile) Rune() rune {
+// Symbol returns the rune representing the visible contents of a tile.
+func (t *Tile) Symbol() rune {
 	if t.occupant != nil {
-		return t.occupant.Rune()
+		return t.occupant.Symbol()
 	}
 	return t.terrain
 }
 
 // String returns the string representing the visible contents of a tile.
 func (t *Tile) String() string {
-	return string(t.Rune())
+	return string(t.Symbol())
 }
