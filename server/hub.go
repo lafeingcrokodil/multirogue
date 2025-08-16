@@ -47,7 +47,7 @@ func (h *Hub) run() {
 			h.handleEvents(c, send, broadcast)
 		case e := <-h.move:
 			var d event.MoveData
-			if err := json.Unmarshal([]byte(e.Event.Data), &d); err != nil {
+			if err := json.Unmarshal([]byte(e.Data), &d); err != nil {
 				log.Print("ERROR:", err.Error())
 				continue
 			}
