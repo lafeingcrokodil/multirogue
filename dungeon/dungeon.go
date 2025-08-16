@@ -2,7 +2,6 @@ package dungeon
 
 import (
 	"math/rand"
-	"time"
 
 	"github.com/lafeingcrokodil/multirogue/creature"
 	"github.com/lafeingcrokodil/multirogue/event"
@@ -26,7 +25,6 @@ type Dungeon struct {
 
 // New just generates a dungeon with one blank level for now.
 func New() *Dungeon {
-	rand.Seed(time.Now().UnixNano())
 	var tiles [][][]Tile
 	for level := 0; level < 21; level++ {
 		tiles = append(tiles, NewLevel())
