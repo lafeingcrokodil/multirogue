@@ -3,6 +3,12 @@ multirogue
 
 A multiplayer version of Rogue.
 
+For a list of available commands, run `make`.
+
+[![GoDoc](https://godoc.org/github.com/lafeingcrokodil/multirogue?status.svg)](https://pkg.go.dev/github.com/lafeingcrokodil/multirogue?tab=doc)
+[![CI](https://github.com/lafeingcrokodil/multirogue/actions/workflows/ci.yml/badge.svg)](https://github.com/lafeingcrokodil/multirogue/actions/workflows/ci.yml)
+[![Go Report Card](https://goreportcard.com/badge/github.com/lafeingcrokodil/multirogue)](https://goreportcard.com/report/github.com/lafeingcrokodil/multirogue)
+
 ## Installation
 
 Make sure that you have Docker installed. For example, you can find instructions for installing the community edition for Ubuntu [here](https://docs.docker.com/install/linux/docker-ce/ubuntu/).
