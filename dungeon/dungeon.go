@@ -26,7 +26,7 @@ type Dungeon struct {
 // New just generates a dungeon with one blank level for now.
 func New() *Dungeon {
 	var tiles [][][]Tile
-	for level := 0; level < 21; level++ {
+	for range 21 {
 		tiles = append(tiles, NewLevel())
 	}
 	return &Dungeon{tiles: tiles}
@@ -93,8 +93,8 @@ func (d *Dungeon) Move(r *creature.Rogue, data event.MoveData) (send, broadcast 
 // Map returns a string representation of the level.
 func (d *Dungeon) Map(r *creature.Rogue) string {
 	var m string
-	for y := 0; y < len(d.tiles[r.Pos.Level]); y++ {
-		for x := 0; x < len(d.tiles[r.Pos.Level][y]); x++ {
+	for y := range len(d.tiles[r.Pos.Level]) {
+		for x := range len(d.tiles[r.Pos.Level][y]) {
 			m += d.tiles[r.Pos.Level][y][x].String()
 		}
 		m += "\n"

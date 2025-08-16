@@ -64,7 +64,7 @@ func (c *Client) writePump() {
 		es := []*event.Event{e}
 
 		// Collect all queued events.
-		for i := 0; i < len(c.send); i++ {
+		for range len(c.send) {
 			es = append(es, <-c.send)
 		}
 

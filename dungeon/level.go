@@ -7,9 +7,9 @@ const breadth = 24
 
 func NewLevel() [][]Tile {
 	var ts [][]Tile
-	for y := 0; y < breadth; y++ {
+	for y := range breadth {
 		var t []Tile
-		for x := 0; x < length; x++ {
+		for x := range length {
 			t = append(t, Tile{x: x, y: y, terrain: Floor})
 		}
 		ts = append(ts, t)
