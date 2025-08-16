@@ -23,3 +23,5 @@ You should then be able to access the app at [localhost:8080](localhost:8080).
 
 - [Build a Realtime Chat Server With Go and WebSockets](https://scotch.io/bar-talk/build-a-realtime-chat-server-with-go-and-websockets)
 - [Chat Example from gorilla/websocket](https://github.com/gorilla/websocket/tree/master/examples/chat)
+- [The Rogue's Vade-Mecum](http://rogue.rogueforge.net/vade-mecum/)
+- [Rogue 5.4.4 Source Code](http://rogue.rogueforge.net/rogue-5-4/)
