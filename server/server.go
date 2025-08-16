@@ -1,3 +1,4 @@
+// Package server implements a server for a multiplayer Rogue game.
 package server
 
 // Sources:

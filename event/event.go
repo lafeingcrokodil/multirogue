@@ -1,3 +1,4 @@
+// Package event contains logic related to events sent between the server and client.
 package event
 
 import (

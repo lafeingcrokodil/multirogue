@@ -1,3 +1,4 @@
+// Package main contains code for starting a web server for a multiplayer Rogue game.
 package main
 
 import (

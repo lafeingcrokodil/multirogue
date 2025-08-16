@@ -1,3 +1,4 @@
+// Package dungeon contains logic related to the dungeon and its levels.
 package dungeon
 
 import (
