@@ -13,11 +13,11 @@ const numLevels = 21
 
 // Creature is a living occupant of the dungeons.
 type Creature interface {
-	// Position returns the rogue's position in the dungeon.
+	// Position returns the creature's position in the dungeon.
 	Position() *creature.Position
-	// Rune returns the rune representing the rogue.
+	// Rune returns the rune representing the creature.
 	Rune() rune
-	// SetPosition sets the rogues position in the dungeon.
+	// SetPosition sets the creature's position in the dungeon.
 	SetPosition(pos *creature.Position)
 }
 

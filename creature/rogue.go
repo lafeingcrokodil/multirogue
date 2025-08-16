@@ -15,7 +15,7 @@ const (
 type Rogue struct {
 	// Name is the rogue's name.
 	Name string
-	// Pos is the rogues position in the dungeon.
+	// Pos is the rogue's position in the dungeon.
 	Pos *Position
 	// Gold is the number of gold pieces that the rogue has found and kept so far.
 	Gold int
