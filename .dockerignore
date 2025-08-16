@@ -1,0 +1,6 @@
+.github/
+.vscode/
+bin/
+.gitignore
+.golangci.*
+README.md
