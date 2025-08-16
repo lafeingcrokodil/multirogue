@@ -43,7 +43,7 @@ func (d *Dungeon) Add(r *creature.Rogue) (send, broadcast []*event.Event) {
 			d.newLevelEvent(r),
 			d.newStatsEvent(r),
 		}, []*event.Event{
-			d.newDisplayEvent(r.Pos),
+			d.newDisplayEvent(r.Position()),
 		}
 }
 
@@ -51,14 +51,14 @@ func (d *Dungeon) Add(r *creature.Rogue) (send, broadcast []*event.Event) {
 func (d *Dungeon) Remove(r *creature.Rogue) (send, broadcast []*event.Event) {
 	d.unoccupy(r)
 	return nil, []*event.Event{
-		d.newDisplayEvent(r.Pos),
+		d.newDisplayEvent(r.Position()),
 	}
 }
 
 // Move moves a rogue from one position to another.
 func (d *Dungeon) Move(r *creature.Rogue, data event.MoveData) (send, broadcast []*event.Event) {
 	// Ascending or descending is only possible via staircases.
-	if data.DLevel != 0 && d.tiles[r.Pos.Level][r.Pos.Y][r.Pos.X].terrain != Staircase {
+	if data.DLevel != 0 && d.tiles[r.Position().Level][r.Position().Y][r.Position().X].terrain != Staircase {
 		return nil, nil
 	}
 
@@ -67,11 +67,11 @@ func (d *Dungeon) Move(r *creature.Rogue, data event.MoveData) (send, broadcast 
 		return nil, nil
 	}
 
-	originalPos := r.Pos
+	originalPos := r.Position()
 	newPos := &creature.Position{
-		Level: r.Pos.Level + data.DLevel,
-		X:     r.Pos.X + data.DX,
-		Y:     r.Pos.Y + data.DY,
+		Level: r.Position().Level + data.DLevel,
+		X:     r.Position().X + data.DX,
+		Y:     r.Position().Y + data.DY,
 	}
 
 	if !d.isValid(newPos) {
@@ -90,16 +90,16 @@ func (d *Dungeon) Move(r *creature.Rogue, data event.MoveData) (send, broadcast 
 
 	return send, []*event.Event{
 		d.newDisplayEvent(originalPos),
-		d.newDisplayEvent(r.Pos),
+		d.newDisplayEvent(r.Position()),
 	}
 }
 
 // Map returns a string representation of the level.
 func (d *Dungeon) Map(r *creature.Rogue) string {
 	var m string
-	for y := range len(d.tiles[r.Pos.Level]) {
-		for x := range len(d.tiles[r.Pos.Level][y]) {
-			m += d.tiles[r.Pos.Level][y][x].String()
+	for y := range len(d.tiles[r.Position().Level]) {
+		for x := range len(d.tiles[r.Position().Level][y]) {
+			m += d.tiles[r.Position().Level][y][x].String()
 		}
 		m += "\n"
 	}
@@ -122,15 +122,15 @@ func (d *Dungeon) newLevelEvent(r *creature.Rogue) *event.Event {
 
 func (d *Dungeon) newStatsEvent(r *creature.Rogue) *event.Event {
 	return event.NewEvent(nil, "stats", event.StatsData{
-		MapLevel:        r.Pos.Level + 1,
-		Gold:            r.Gold,
-		HitPoints:       r.HitPoints,
-		MaxHitPoints:    r.MaxHitPoints,
-		Strength:        r.Strength,
-		MaxStrength:     r.MaxStrength,
+		MapLevel:        r.Position().Level + 1,
+		Gold:            r.Gold(),
+		HitPoints:       r.HitPoints(),
+		MaxHitPoints:    r.MaxHitPoints(),
+		Strength:        r.Strength(),
+		MaxStrength:     r.MaxStrength(),
 		ArmourClass:     r.ArmourClass(),
-		ExperienceLevel: r.ExperienceLevel,
-		Experience:      r.Experience,
+		ExperienceLevel: r.ExperienceLevel(),
+		Experience:      r.Experience(),
 	})
 }
 
