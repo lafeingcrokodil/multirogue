@@ -9,13 +9,13 @@ let MultiRogue = new Vue({
   },
 
   methods: {
-    display: function({c, x, y}) {
+    display: function ({ c, x, y }) {
       let line = this.map[y]; // in the yth line...
       line.splice(x, 1, c); // replace the xth character with c
       Vue.set(this.map, y, line);
     },
 
-    displayLevel: function({map}) {
+    displayLevel: function ({ map }) {
       let newMap = [];
       let line = [];
       let c;
@@ -31,7 +31,7 @@ let MultiRogue = new Vue({
       this.map = newMap;
     },
 
-    displayStats: function({mapLvl, gold, hp, maxHP, str, maxStr, arm, lvl, exp}) {
+    displayStats: function ({ mapLvl, gold, hp, maxHP, str, maxStr, arm, lvl, exp }) {
       // Construct stat string.
       let statStr = '';
       statStr += 'Lvl: ' + toPaddedString(mapLvl, 4);
@@ -52,7 +52,7 @@ let MultiRogue = new Vue({
       this.stats = stats;
     },
 
-    handleEvent: function(e) {
+    handleEvent: function (e) {
       let events = JSON.parse(e.data);
       for (event of events) {
         switch (event.name) {
@@ -71,14 +71,14 @@ let MultiRogue = new Vue({
       }
     },
 
-    fireEvent: function(name, data) {
+    fireEvent: function (name, data) {
       this.ws.send(JSON.stringify({
         name: name,
         data: JSON.stringify(data)
       }));
     },
 
-    join: function() {
+    join: function () {
       if (!this.name) {
         alert('Please enter a name between 1 and 16 characters.');
         return;
@@ -93,55 +93,55 @@ let MultiRogue = new Vue({
       document.addEventListener('keydown', this.handleKeydown.bind(this));
     },
 
-    handleKeydown: function(event) {
+    handleKeydown: function (event) {
       switch (event.key) {
         case 'ArrowLeft':
         case 'h':
         case '4':
-          this.fireEvent('move', {dx: -1, dy: 0});
+          this.fireEvent('move', { dx: -1, dy: 0 });
           break;
         case 'ArrowRight':
         case 'l':
         case '6':
-          this.fireEvent('move', {dx: 1, dy: 0});
+          this.fireEvent('move', { dx: 1, dy: 0 });
           break;
         case 'ArrowUp':
         case 'k':
         case '8':
-          this.fireEvent('move', {dx: 0, dy: -1});
+          this.fireEvent('move', { dx: 0, dy: -1 });
           break;
         case 'ArrowDown':
         case 'j':
         case '2':
-          this.fireEvent('move', {dx: 0, dy: 1});
+          this.fireEvent('move', { dx: 0, dy: 1 });
           break;
         case 'Home':
         case 'y':
         case '7':
-          this.fireEvent('move', {dx: -1, dy: -1});
+          this.fireEvent('move', { dx: -1, dy: -1 });
           break;
         case 'PageUp':
         case 'u':
         case '9':
-          this.fireEvent('move', {dx: 1, dy: -1});
+          this.fireEvent('move', { dx: 1, dy: -1 });
           break;
         case 'End':
         case 'b':
         case '1':
-          this.fireEvent('move', {dx: -1, dy: 1});
+          this.fireEvent('move', { dx: -1, dy: 1 });
           break;
         case 'PageDown':
         case 'n':
         case '3':
-          this.fireEvent('move', {dx: 1, dy: 1});
+          this.fireEvent('move', { dx: 1, dy: 1 });
           break;
         case 'Clear':
         case '.':
         case '5':
-          this.fireEvent('move', {dx: 0, dy: 0});
+          this.fireEvent('move', { dx: 0, dy: 0 });
           break;
         case '>':
-          this.fireEvent('move', {dlvl: 1});
+          this.fireEvent('move', { dlvl: 1 });
           break;
         default:
           console.error('unsupported key press:', event.key);
