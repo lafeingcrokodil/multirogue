@@ -13,6 +13,7 @@ import (
 // ClientEvent is an event fired by a client.
 type ClientEvent struct {
 	event.Event
+
 	// Source is the client that fired the event.
 	Source *Client
 }
