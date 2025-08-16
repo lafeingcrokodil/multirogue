@@ -1,3 +1,5 @@
+.PHONY: $(shell ls)
+
 help: ## Show this help.
 	@ sed -nEe '/@sed/!s/[^:#]*##\s*/ /p' $(MAKEFILE_LIST) | column -tl 2
 
