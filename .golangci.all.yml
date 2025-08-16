@@ -1,0 +1,14 @@
+version: "2"
+linters:
+  default: all
+  disable:
+    - depguard
+    - exhaustruct
+    - nlreturn
+    - nonamedreturns
+    - wsl
+    - wsl_v5
+  exclusions:
+    rules:
+      - linters: [gosec]
+        text: "G404:" # Use of weak random number generator

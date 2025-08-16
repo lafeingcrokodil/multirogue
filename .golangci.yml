@@ -1,0 +1,16 @@
+version: "2"
+linters:
+  enable:
+    - embeddedstructfieldcheck
+    - gosec
+    - intrange
+    - mnd
+    - noinlineerr
+    - nolintlint
+    - prealloc
+    - revive
+    - tagliatelle
+  exclusions:
+    rules:
+      - linters: [gosec]
+        text: "G404:" # Use of weak random number generator
