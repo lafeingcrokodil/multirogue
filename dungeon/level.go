@@ -1,6 +1,6 @@
 package dungeon
 
-import "math/rand"
+import "math/rand/v2"
 
 const length = 80
 const breadth = 24
@@ -20,5 +20,5 @@ func NewLevel() [][]Tile {
 }
 
 func staircasePos() (x, y int) {
-	return rand.Intn(length), rand.Intn(breadth)
+	return rand.IntN(length), rand.IntN(breadth)
 }

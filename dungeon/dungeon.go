@@ -1,7 +1,7 @@
 package dungeon
 
 import (
-	"math/rand"
+	"math/rand/v2"
 
 	"github.com/lafeingcrokodil/multirogue/creature"
 	"github.com/lafeingcrokodil/multirogue/event"
@@ -142,8 +142,8 @@ func (d *Dungeon) unoccupy(c Creature) {
 
 func (d *Dungeon) randomSpawnPos(level int) *creature.Position {
 	for {
-		x := rand.Intn(len(d.tiles[level][0]))
-		y := rand.Intn(len(d.tiles[level]))
+		x := rand.IntN(len(d.tiles[level][0]))
+		y := rand.IntN(len(d.tiles[level]))
 		if d.isValidSpawnPos(level, x, y) {
 			return &creature.Position{
 				Level: level,
