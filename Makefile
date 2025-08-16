@@ -10,16 +10,6 @@ build:
 		go build -o bin/multirogue -ldflags "-X main.version=$$VERSION" \
 		cmd/main.go
 
-docker-lint:
-	docker pull golangci/golangci-lint:latest
-	docker run -v `pwd`:/workspace -w /workspace golangci/golangci-lint:latest \
-		golangci-lint run ./...
-
-docker-test:
-	docker pull golang:1
-	docker run -v `pwd`:/workspace -w /workspace golang:1 \
-		go test -coverpkg ./... -race ./...
-
 docker-run:
 	docker build -t multirogue .
 	docker run --rm -p 8080:8080 multirogue
