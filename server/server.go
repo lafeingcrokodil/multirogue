@@ -20,6 +20,8 @@ const (
 	readTimeout  = 5 * time.Second
 	writeTimeout = 10 * time.Second
 	idleTimeout  = 120 * time.Second
+
+	eventBufferSize = 256
 )
 
 // Server is a MultiRogue server.
@@ -75,7 +77,7 @@ func (s *Server) handleConnection(w http.ResponseWriter, r *http.Request) {
 		rogue: creature.NewRogue(r.URL.Query().Get("name")),
 		hub:   s.hub,
 		conn:  conn,
-		send:  make(chan *event.Event, 256),
+		send:  make(chan *event.Event, eventBufferSize),
 	}
 	c.hub.register <- c
 

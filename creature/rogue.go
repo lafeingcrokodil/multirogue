@@ -1,5 +1,16 @@
 package creature
 
+const (
+	initialMaxHealthPoints = 12
+	initialMaxStrength     = 16
+	initialExperienceLevel = 1
+
+	// We're hardcoding the armour class for now, but we can get rid of this
+	// after implementing logic for deriving the armour class from the armour
+	// being worn by the rogue.
+	armourClass = 4
+)
+
 // Rogue is an adventurer in a dungeon.
 type Rogue struct {
 	// Name is the rogue's name.
@@ -26,12 +37,17 @@ type Rogue struct {
 func NewRogue(name string) *Rogue {
 	return &Rogue{
 		Name:            name,
-		HealthPoints:    12,
-		MaxHealthPoints: 12,
-		Strength:        16,
-		MaxStrength:     16,
-		ExperienceLevel: 1,
+		HealthPoints:    initialMaxHealthPoints,
+		MaxHealthPoints: initialMaxHealthPoints,
+		Strength:        initialMaxStrength,
+		MaxStrength:     initialMaxStrength,
+		ExperienceLevel: initialExperienceLevel,
 	}
+}
+
+// ArmourClass returns the rogue's current armour class.
+func (r *Rogue) ArmourClass() int {
+	return armourClass // TODO: derive armour class from currently-worn armour
 }
 
 // Position returns the rogue's current position.

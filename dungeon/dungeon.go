@@ -8,6 +8,9 @@ import (
 	"github.com/lafeingcrokodil/multirogue/event"
 )
 
+// numLevels is the number of levels in the dungeon.
+const numLevels = 21
+
 // Creature is a living occupant of the dungeons.
 type Creature interface {
 	// Position returns the rogue's position in the dungeon.
@@ -24,10 +27,10 @@ type Dungeon struct {
 	tiles [][][]Tile
 }
 
-// New just generates a dungeon with one blank level for now.
+// New just generates a dungeon with blank levels for now.
 func New() *Dungeon {
 	var tiles [][][]Tile
-	for range 21 {
+	for range numLevels {
 		tiles = append(tiles, NewLevel())
 	}
 	return &Dungeon{tiles: tiles}
@@ -125,7 +128,7 @@ func (d *Dungeon) newStatsEvent(r *creature.Rogue) *event.Event {
 		MaxHealthPoints: r.MaxHealthPoints,
 		Strength:        r.Strength,
 		MaxStrength:     r.MaxStrength,
-		ArmourClass:     4, // TODO: derive armour class from currently-worn armour
+		ArmourClass:     r.ArmourClass(),
 		ExperienceLevel: r.ExperienceLevel,
 		Experience:      r.Experience,
 	})
