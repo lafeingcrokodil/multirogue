@@ -63,10 +63,10 @@ type StatsData struct {
 	MapLevel int `json:"mapLvl"`
 	// Gold is the number of gold pieces that the rogue has found and kept so far.
 	Gold int `json:"gold"`
-	// HealthPoints is the rogue's current number of health points.
-	HealthPoints int `json:"hp"`
-	// MaxHealthPoints is the rogue's number of health points when fully healed.
-	MaxHealthPoints int `json:"maxHp"`
+	// HitPoints is the rogue's current number of hit points.
+	HitPoints int `json:"hp"`
+	// MaxHitPoints is the rogue's number of hit points when fully healed.
+	MaxHitPoints int `json:"maxHp"`
 	// Strength is the rogue's current strength.
 	Strength int `json:"str"`
 	// MaxStrength is the maximum strength that the rogue has attained so far.

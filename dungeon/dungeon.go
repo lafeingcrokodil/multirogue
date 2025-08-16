@@ -124,8 +124,8 @@ func (d *Dungeon) newStatsEvent(r *creature.Rogue) *event.Event {
 	return event.NewEvent(nil, "stats", event.StatsData{
 		MapLevel:        r.Pos.Level + 1,
 		Gold:            r.Gold,
-		HealthPoints:    r.HealthPoints,
-		MaxHealthPoints: r.MaxHealthPoints,
+		HitPoints:       r.HitPoints,
+		MaxHitPoints:    r.MaxHitPoints,
 		Strength:        r.Strength,
 		MaxStrength:     r.MaxStrength,
 		ArmourClass:     r.ArmourClass(),

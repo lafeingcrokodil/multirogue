@@ -1,7 +1,7 @@
 package creature
 
 const (
-	initialMaxHealthPoints = 12
+	initialMaxHitPoints    = 12
 	initialMaxStrength     = 16
 	initialExperienceLevel = 1
 
@@ -19,10 +19,10 @@ type Rogue struct {
 	Pos *Position
 	// Gold is the number of gold pieces that the rogue has found and kept so far.
 	Gold int
-	// HealthPoints is the rogue's current number of health points.
-	HealthPoints int
-	// MaxHealthPoints is the rogue's number of health points when fully healed.
-	MaxHealthPoints int
+	// HitPoints is the rogue's current number of hit points.
+	HitPoints int
+	// MaxHitPoints is the rogue's number of hit points when fully healed.
+	MaxHitPoints int
 	// Strength is the rogue's current strength.
 	Strength int
 	// MaxStrength is the maximum strength that the rogue has attained so far.
@@ -37,8 +37,8 @@ type Rogue struct {
 func NewRogue(name string) *Rogue {
 	return &Rogue{
 		Name:            name,
-		HealthPoints:    initialMaxHealthPoints,
-		MaxHealthPoints: initialMaxHealthPoints,
+		HitPoints:       initialMaxHitPoints,
+		MaxHitPoints:    initialMaxHitPoints,
 		Strength:        initialMaxStrength,
 		MaxStrength:     initialMaxStrength,
 		ExperienceLevel: initialExperienceLevel,
