@@ -34,14 +34,17 @@ func NewRogue(name string) *Rogue {
 	}
 }
 
+// Position returns the rogue's current position.
 func (r *Rogue) Position() *Position {
 	return r.Pos
 }
 
+// Rune returns the rune representing the rogue.
 func (r *Rogue) Rune() rune {
 	return '@'
 }
 
+// SetPosition moves the rogue to the specified position.
 func (r *Rogue) SetPosition(pos *Position) {
 	r.Pos = pos
 }
