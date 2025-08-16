@@ -33,7 +33,7 @@ type Client struct {
 func (c *Client) readPump() {
 	defer func() {
 		c.hub.unregister <- c
-		c.conn.Close()
+		c.conn.Close() //nolint:errcheck,gosec
 	}()
 	for {
 		var e event.Event
@@ -58,7 +58,7 @@ func (c *Client) readPump() {
 // application ensures that there is at most one writer to a connection by
 // executing all writes from this goroutine.
 func (c *Client) writePump() {
-	defer c.conn.Close()
+	defer c.conn.Close() //nolint:errcheck
 	for e := range c.send {
 		es := []*event.Event{e}
 
