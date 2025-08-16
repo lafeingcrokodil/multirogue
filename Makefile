@@ -18,6 +18,9 @@ lint-all: ## Run all linters that aren't explicitly disabled.
 test: ## Run unit tests.
 	@ go test -coverpkg ./... -race ./...
 
-docker-run: ## Run the application in a local Docker container.
+web-docker: ## Run the application in a local Docker container.
 	@ docker build -t multirogue .
 	@ docker run --rm -p 8080:8080 multirogue
+
+web-dev: ## Run the application locally without using Docker.
+	@ go run cmd/main.go

@@ -9,7 +9,7 @@ Make sure that you have Docker installed. For example, you can find instructions
 
 Start the server by running
 
-    make docker-run
+    make web-docker
 
 You should then be able to access the app at [localhost:8080](localhost:8080).
 
