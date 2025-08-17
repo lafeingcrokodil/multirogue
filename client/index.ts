@@ -194,7 +194,8 @@ createApp({
         return;
       }
 
-      ws = new WebSocket("ws://" + window.location.host + "/ws?name=" + name.value);
+      const protocol = window.location.protocol === "https:" ? "wss://" : "ws://";
+      ws = new WebSocket(protocol + window.location.host + "/ws?name=" + name.value);
 
       ws.onopen = () => {
         console.log("Connected to server");
@@ -208,8 +209,8 @@ createApp({
         joined.value = false;
       };
 
-      ws.onerror = (err) => {
-        throw new Error("Websocket error: " + err);
+      ws.onerror = (event: Event) => {
+        throw new Error("Websocket error: " + JSON.stringify(event));
       };
 
       document.addEventListener("keydown", handleKeydown);
