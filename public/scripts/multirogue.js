@@ -32,6 +32,10 @@ let MultiRogue = new Vue({
       this.map = newMap;
     },
 
+    displayNotification: function ({ msg }) {
+      this.notification = this.toLine(msg);
+    },
+
     displayStats: function ({ mapLvl, gold, hp, maxHp, str, maxStr, arm, lvl, exp }) {
       // Construct stat string.
       let statStr = '';
@@ -41,16 +45,9 @@ let MultiRogue = new Vue({
       statStr += 'Str: ' + toPaddedString(`${str}(${maxStr})`, 8);
       statStr += 'Arm: ' + toPaddedString(arm, 4);
       statStr += `Exp: ${lvl}/${exp}`;
-      statStr = toPaddedString(statStr, this.map[0].length);
-
-      // Convert string into array of characters.
-      let stats = [];
-      for (let i = 0; i < statStr.length; i++) {
-        stats.push(statStr.charAt(i));
-      }
 
       // Publish updated stats.
-      this.stats = stats;
+      this.stats = this.toLine(statStr);
     },
 
     handleEvent: function (e) {
@@ -62,6 +59,9 @@ let MultiRogue = new Vue({
             break;
           case 'level':
             this.displayLevel(JSON.parse(event.data));
+            break;
+          case 'notification':
+            this.displayNotification(JSON.parse(event.data));
             break;
           case 'stats':
             this.displayStats(JSON.parse(event.data));
@@ -149,6 +149,19 @@ let MultiRogue = new Vue({
           return; // don't prevent default for unrecognized keys
       }
       event.preventDefault();
+    },
+
+    toLine: function (str) {
+      // Make sure that the string has the right length.
+      let paddedStr = toPaddedString(str, this.map[0].length);
+
+      // Convert string into array of characters.
+      let line = [];
+      for (let i = 0; i < paddedStr.length; i++) {
+        line.push(paddedStr.charAt(i));
+      }
+
+      return line;
     }
   }
 });

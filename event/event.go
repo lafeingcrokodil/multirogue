@@ -57,6 +57,12 @@ type MoveData struct {
 	DY int `json:"dy"`
 }
 
+// NotificationData is information related to a "notification" event.
+type NotificationData struct {
+	// Message is the message to be displayed to the player.
+	Message string `json:"msg"`
+}
+
 // StatsData describe a rogue's current status.
 type StatsData struct {
 	// MapLevel is how deep the rogue has gone in the dungeon.

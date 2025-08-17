@@ -40,6 +40,7 @@ func (d *Dungeon) Add(r *creature.Rogue) (send, broadcast []*event.Event) {
 			d.newStatsEvent(r),
 		}, []*event.Event{
 			d.newDisplayEvent(r.Info().Pos),
+			d.newNotificationEvent(r.Info().Name + " has entered the dungeon."),
 		}
 }
 
@@ -48,6 +49,7 @@ func (d *Dungeon) Remove(r *creature.Rogue) (send, broadcast []*event.Event) {
 	d.unoccupy(r)
 	return nil, []*event.Event{
 		d.newDisplayEvent(r.Info().Pos),
+		d.newNotificationEvent(r.Info().Name + " has left the dungeon."),
 	}
 }
 
@@ -113,6 +115,12 @@ func (d *Dungeon) newDisplayEvent(pos *creature.Position) *event.Event {
 func (d *Dungeon) newLevelEvent(r *creature.Rogue) *event.Event {
 	return event.NewEvent(nil, "level", event.LevelData{
 		Map: d.Map(r),
+	})
+}
+
+func (d *Dungeon) newNotificationEvent(msg string) *event.Event {
+	return event.NewEvent(nil, "notification", event.NotificationData{
+		Message: msg,
 	})
 }
 
