@@ -22,6 +22,7 @@
         title="Please enter a name between 1 and 16 characters." v-model="name" @keyup.enter="join">
     </div>
     <p id="screen" v-if="joined" v-cloak>
+      <span v-for="c of notification">{{ c }}</span><br />
       <span v-for="line of map">
         <span v-for="c of line">{{ c }}</span><br />
       </span>

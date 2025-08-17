@@ -3,7 +3,7 @@ package dungeon
 import "math/rand/v2"
 
 const length = 80
-const breadth = 24
+const breadth = 22
 
 // NewLevel randomly generates a new dungeon level.
 func NewLevel() [][]Tile {

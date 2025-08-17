@@ -4,6 +4,7 @@ let MultiRogue = new Vue({
   data: {
     joined: false, // true if we have joined the game
     name: null, // name of our adventurer
+    notification: [], // notification to be displayed above the map
     map: [], // lines of characters displayed on the screen
     stats: [] // player stats to be displayed below the map
   },
