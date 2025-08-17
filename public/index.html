@@ -14,23 +14,31 @@
 </head>
 
 <body>
-  <main id="multirogue">
-    <div class="panel" v-if="!joined">
+  <main id="app">
+    <section class="panel" v-if="!joined">
       <h2>Welcome, Adventurer!</h2>
       <p>Are you ready to enter the Dungeons of Doom? If so, please write your name below and press ENTER.</p>
-      <input type="text" id="name" maxlength="16" minlength="1" placeholder="Name" size="16" spellcheck="false"
-        title="Please enter a name between 1 and 16 characters." v-model="name" @keyup.enter="join">
-    </div>
-    <p id="screen" v-if="joined" v-cloak>
-      <span v-for="c of notification">{{ c }}</span><br />
-      <span v-for="line of map">
-        <span v-for="c of line">{{ c }}</span><br />
+      <input type="text" maxlength="16" minlength="1" placeholder="Name" size="16" spellcheck="false"
+        title="Please enter a name between 1 and 16 characters." v-model="name" @keyup.enter="join" />
+    </section>
+
+    <section id="screen" v-else v-cloak>
+      <span v-if="notifications.length > 0">{{ notifications[0] }}</span><br />
+      <span v-for="line in map">
+        <span v-for="c in line">{{ c }}</span><br />
       </span>
-      <span v-for="c of stats">{{ c }}</span><br />
-    </p>
+      <span>{{ stats }}</span><br />
+    </section>
   </main>
 
-  <script src="/index.js"></script>
+  <script type="importmap">
+    {
+      "imports": {
+        "vue": "https://unpkg.com/vue@3/dist/vue.esm-browser.js"
+      }
+    }
+  </script>
+  <script type="module" src="/index.js"></script>
 </body>
 
 </html>
