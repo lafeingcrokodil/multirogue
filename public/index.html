@@ -21,7 +21,7 @@
       <input type="text" id="name" maxlength="16" minlength="1" placeholder="Name" size="16" spellcheck="false"
         title="Please enter a name between 1 and 16 characters." v-model="name" @keyup.enter="join">
     </div>
-    <p id="screen" v-if="joined">
+    <p id="screen" v-if="joined" v-cloak>
       <span v-for="line of map">
         <span v-for="c of line">{{ c }}</span><br />
       </span>
