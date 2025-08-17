@@ -19,14 +19,13 @@
       <h2>Welcome, Adventurer!</h2>
       <p>Are you ready to enter the Dungeons of Doom? If so, please write your name below and press ENTER.</p>
       <input type="text" id="name" maxlength="16" minlength="1" placeholder="Name" size="16" spellcheck="false"
-        title="Please enter a name between 1 and 16 characters."
-        v-model="name" @keyup.enter="join">
+        title="Please enter a name between 1 and 16 characters." v-model="name" @keyup.enter="join">
     </div>
     <p id="screen" v-if="joined">
       <span v-for="line of map">
-        <span v-for="c of line">{{ c }}</span><br/>
+        <span v-for="c of line">{{ c }}</span><br />
       </span>
-      <span v-for="c of stats">{{ c }}</span><br/>
+      <span v-for="c of stats">{{ c }}</span><br />
     </p>
   </main>
 
