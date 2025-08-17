@@ -4,7 +4,7 @@ provider "cloudflare" {
 
 resource "cloudflare_dns_record" "staging" {
   zone_id = var.cloudflare_zone_id
-  name    = "staging.multirogue"
+  name    = "staging.multirogue.lafeingcrokodil.com"
   content = "ghs.googlehosted.com"
   type    = "CNAME"
   ttl     = 300
@@ -13,7 +13,7 @@ resource "cloudflare_dns_record" "staging" {
 
 resource "cloudflare_dns_record" "production" {
   zone_id = var.cloudflare_zone_id
-  name    = "multirogue"
+  name    = "multirogue.lafeingcrokodil.com"
   content = "ghs.googlehosted.com"
   type    = "CNAME"
   ttl     = 300
