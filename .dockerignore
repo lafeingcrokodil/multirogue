@@ -6,6 +6,7 @@ node_modules/
 tmp/
 .gitignore
 .golangci.*
+env.*
 LICENSE
 package-lock.json
 package.json

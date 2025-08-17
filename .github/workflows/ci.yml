@@ -55,4 +55,5 @@ jobs:
             --image="$IMAGE" \
             --region="$REGION" \
             --service-account="staging@$PROJECT_ID.iam.gserviceaccount.com" \
-            --allow-unauthenticated
+            --allow-unauthenticated \
+            --set-env-vars="$(grep -v '^#' env.staging | grep -v '^\s*$' | xargs | sed 's/ /,/g')"

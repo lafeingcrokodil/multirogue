@@ -26,7 +26,13 @@ test: ## Run unit tests.
 
 web-docker: tsc ## Run the application in a local Docker container.
 	@ docker build -t multirogue .
-	@ docker run --rm -p 8080:8080 multirogue
+	@ docker run --rm \
+		-v $(HOME)/.config/gcloud:/root/.config/gcloud \
+		--env-file env.staging \
+		-p 8080:8080 \
+		multirogue
 
 web-dev: tsc ## Run the application locally without using Docker.
-	@ go run cmd/web/main.go
+	@ set -a \
+		&& . ./env.staging \
+		&& go run cmd/web/main.go
