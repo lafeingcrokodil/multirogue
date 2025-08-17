@@ -16,6 +16,8 @@ resource "google_project_service" "enable_apis" {
   for_each = toset([
     "artifactregistry.googleapis.com",
     "compute.googleapis.com",
+    "firebaserules.googleapis.com",
+    "firestore.googleapis.com",
     "iamcredentials.googleapis.com",
     "oslogin.googleapis.com",
     "run.googleapis.com",
