@@ -1,8 +1,6 @@
 // Package creature contains logic related to creatures that inhabit the dungeon.
 package creature
 
-import "github.com/lafeingcrokodil/multirogue/random"
-
 const maxArmourClass = 10
 
 // Position specifies a position in a dungeon.
@@ -22,7 +20,7 @@ type Creature struct {
 	pos             *Position
 	gold            int
 	armourClass     int
-	damage          []*random.Dice
+	damage          string
 	experience      int
 	experienceLevel int
 	hitPoints       int
