@@ -1,7 +1,8 @@
 // Package creature contains logic related to creatures that inhabit the dungeon.
 package creature
 
-const maxArmourClass = 10
+// MaxArmourClass is the maximum (weakest) armour class.
+const MaxArmourClass = 10
 
 // Position specifies a position in a dungeon.
 type Position struct {
@@ -13,78 +14,30 @@ type Position struct {
 	Y int
 }
 
-// Creature is a living occupant of the dungeons.
-type Creature struct {
-	name            string
-	symbol          rune
-	pos             *Position
-	gold            int
-	armourClass     int
-	damage          string
-	experience      int
-	experienceLevel int
-	hitPoints       int
-	maxHitPoints    int
-	strength        int
-	maxStrength     int
-}
-
-// Name returns the creature's name.
-func (c *Creature) Name() string {
-	return c.name
-}
-
-// Symbol returns the rune representing the creature.
-func (c *Creature) Symbol() rune {
-	return c.symbol
-}
-
-// Position returns the creature's position in the dungeon.
-func (c *Creature) Position() *Position {
-	return c.pos
-}
-
-// SetPosition sets the creature's position in the dungeon.
-func (c *Creature) SetPosition(pos *Position) {
-	c.pos = pos
-}
-
-// Gold returns the number of gold pieces that the creature is carrying.
-func (c *Creature) Gold() int {
-	return c.gold
-}
-
-// ArmourClass returns the creature's current armour class.
-func (c *Creature) ArmourClass() int {
-	return c.armourClass
-}
-
-// Experience returns the number of experience points that the creature has gained so far.
-func (c *Creature) Experience() int {
-	return c.experience
-}
-
-// ExperienceLevel returns the creature's current experience level.
-func (c *Creature) ExperienceLevel() int {
-	return c.experienceLevel
-}
-
-// HitPoints returns the creature's current number of hit points.
-func (c *Creature) HitPoints() int {
-	return c.hitPoints
-}
-
-// MaxHitPoints returns the creature's number of hit points when fully healed.
-func (c *Creature) MaxHitPoints() int {
-	return c.maxHitPoints
-}
-
-// Strength returns the creature's current strength.
-func (c *Creature) Strength() int {
-	return c.strength
-}
-
-// MaxStrength returns the maximum strength that the creature has attained so far.
-func (c *Creature) MaxStrength() int {
-	return c.maxStrength
+// Information is information about a living occupant of the dungeons.
+type Information struct {
+	// Name is the creature's name.
+	Name string
+	// Symbol is the rune representing the creature.
+	Symbol rune
+	// Pos is the creature's position in the dungeon.
+	Pos *Position
+	// DamageDice are rolled to determine how much damage the creature deals.
+	DamageDice string
+	// ArmourClass is the creature's inherent armour class when not wearing armour.
+	ArmourClass int
+	// Experience is the amount of experience that the creature has accumulated.
+	Experience int
+	// ExperienceLevel is the creature's experience level.
+	ExperienceLevel int
+	// Gold is the amount of gold that the creature currently possesses.
+	Gold int
+	// HitPoints is the creature's current number of hit points.
+	HitPoints int
+	// MaxHitPoints is the creature's number of hit points when fully healed.
+	MaxHitPoints int
+	// Strength is the creature's current strength.
+	Strength int
+	// MaxStrength is the maximum strength that the creature has attained so far.
+	MaxStrength int
 }

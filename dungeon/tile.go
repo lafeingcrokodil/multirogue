@@ -18,7 +18,7 @@ type Tile struct {
 // Symbol returns the rune representing the visible contents of a tile.
 func (t *Tile) Symbol() rune {
 	if t.occupant != nil {
-		return t.occupant.Symbol()
+		return t.occupant.Info().Symbol
 	}
 	return t.terrain
 }

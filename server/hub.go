@@ -33,12 +33,12 @@ func (h *Hub) run() {
 	for {
 		select {
 		case c := <-h.register:
-			log.Printf("INFO: Registering new client %s...", c.rogue.Name())
+			log.Printf("INFO: Registering new client %s...", c.rogue.Info().Name)
 			h.clients[c] = true
 			send, broadcast := h.dungeon.Add(c.rogue)
 			h.handleEvents(c, send, broadcast)
 		case c := <-h.unregister:
-			log.Printf("INFO: Unregistering client %s...", c.rogue.Name())
+			log.Printf("INFO: Unregistering client %s...", c.rogue.Info().Name)
 			if _, ok := h.clients[c]; ok {
 				delete(h.clients, c)
 				close(c.send)
@@ -70,7 +70,7 @@ func (h *Hub) handleEvents(c *Client, send, broadcast []*event.Event) {
 func (h *Hub) broadcast(e *event.Event) {
 	for c := range h.clients {
 		// Check if the event is relevant for the client.
-		if e.Level != nil && c.rogue.Position().Level != *e.Level {
+		if e.Level != nil && c.rogue.Info().Pos.Level != *e.Level {
 			continue // if not, don't send it
 		}
 		select {
