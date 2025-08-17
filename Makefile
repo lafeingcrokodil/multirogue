@@ -15,12 +15,18 @@ lint: ## Run standard linters and a few additional explicitly enabled ones.
 lint-all: ## Run all linters that aren't explicitly disabled.
 	@ golangci-lint run -c .golangci.all.yml
 
+tsc: ## Compile TypeScript code.
+	@ . $(HOME)/.nvm/nvm.sh \
+		&& nvm install stable \
+		&& npm install \
+		&& npx tsc
+
 test: ## Run unit tests.
 	@ go test -coverpkg ./... -race ./...
 
-web-docker: ## Run the application in a local Docker container.
+web-docker: tsc ## Run the application in a local Docker container.
 	@ docker build -t multirogue .
 	@ docker run --rm -p 8080:8080 multirogue
 
-web-dev: ## Run the application locally without using Docker.
+web-dev: tsc ## Run the application locally without using Docker.
 	@ go run cmd/web/main.go

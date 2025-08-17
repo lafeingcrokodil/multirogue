@@ -1,6 +1,13 @@
 .github/
 .vscode/
 bin/
+client/
+node_modules/
+tmp/
 .gitignore
 .golangci.*
+LICENSE
+package-lock.json
+package.json
 README.md
+tsconfig.json
