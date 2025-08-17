@@ -4,9 +4,7 @@
   "description": "Multiplayer version of Rogue",
   "license": "GPL-3.0-or-later",
   "devDependencies": {
-    "typescript": "^5.9.2"
-  },
-  "dependencies": {
+    "typescript": "^5.9.2",
     "vue": "^3.5.18"
   }
 }
