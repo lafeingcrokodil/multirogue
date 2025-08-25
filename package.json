@@ -5,6 +5,6 @@
   "license": "GPL-3.0-or-later",
   "devDependencies": {
     "typescript": "^5.9.2",
-    "vue": "^3.5.18"
+    "vue": "^3.5.20"
   }
 }
